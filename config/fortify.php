@@ -46,7 +46,7 @@ return [
     |
     */
 
-    'username' => 'email',
+    'username' => 'username',
 
     'email' => 'email',
 
@@ -74,7 +74,7 @@ return [
     |
     */
 
-    'home' => RouteServiceProvider::HOME,
+    'home' => '/dashboard',
 
     /*
     |--------------------------------------------------------------------------

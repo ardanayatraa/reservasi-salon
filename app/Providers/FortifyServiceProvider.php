@@ -3,14 +3,15 @@
 namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
-use App\Actions\Fortify\ResetUserPassword;
-use App\Actions\Fortify\UpdateUserPassword;
-use App\Actions\Fortify\UpdateUserProfileInformation;
+use App\Models\Admin;
+use App\Models\Pelanggan;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Support\ServiceProvider;
 use Laravel\Fortify\Fortify;
 
 class FortifyServiceProvider extends ServiceProvider
@@ -28,19 +29,48 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Fortify::createUsersUsing(CreateNewUser::class);
-        Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
-        Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
-        Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
+        // Gunakan field "username" untuk login
+        Fortify::username(fn() => 'username');
 
-        RateLimiter::for('login', function (Request $request) {
-            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
+        // Kustomisasi proses authenticate
+        Fortify::authenticateUsing(function (Request $request) {
+            $username = $request->input('username');
+            $password = $request->input('password');
 
-            return Limit::perMinute(5)->by($throttleKey);
+            // Cek Pelanggan dulu
+            $pelanggan = Pelanggan::where('username', $username)->first();
+            if ($pelanggan && Hash::check($password, $pelanggan->password)) {
+                session(['role' => 'pelanggan']);
+                Auth::guard('pelanggan')->login($pelanggan);
+                return $pelanggan;
+            }
+
+            // Cek Admin
+            $admin = Admin::where('username', $username)->first();
+            if ($admin && Hash::check($password, $admin->password)) {
+                session(['role' => 'admin']);
+                Auth::guard('admin')->login($admin);
+                return $admin;
+            }
+
+            // Gagal
+            return null;
         });
 
+        // Rate limiting untuk login
+        RateLimiter::for('login', function (Request $request) {
+            $key = Str::transliterate(Str::lower($request->input(Fortify::username())) . '|' . $request->ip());
+            return Limit::perMinute(5)->by($key);
+        });
+
+        // Rate limiting untuk two-factor (jika dipakai)
         RateLimiter::for('two-factor', function (Request $request) {
             return Limit::perMinute(5)->by($request->session()->get('login.id'));
         });
+
+          Fortify::createUsersUsing(CreateNewUser::class);
+
+        // View untuk form login
+        Fortify::loginView(fn() => view('auth.login'));
     }
 }
