@@ -400,10 +400,7 @@
                     class="px-8 py-3 btn-primary rounded-sm font-light text-sm uppercase tracking-wider">
                     Layanan Kami
                 </a>
-                <a href="#history"
-                    class="px-8 py-3 border-2 border-white text-white rounded-sm font-light text-sm uppercase tracking-wider hover:bg-white hover:text-dark transition duration-300">
-                    Reservasi
-                </a>
+
             </div>
         </div>
     </section>
