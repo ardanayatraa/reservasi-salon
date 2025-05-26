@@ -1,14 +1,38 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+    <div class="px-4 py-6 bg-white shadow sm:rounded-lg">
+        <h2 class="text-2xl font-semibold text-gray-800">Dashboard Ringkasan</h2>
+    </div>
 
-    <div class="py-12">
-        <div class="w-full mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                <x-welcome />
+    <div class="p-6 space-y-6">
+        <div class="flex flex-wrap gap-6">
+            {{-- Total Pemesanan --}}
+            <div class="flex-1 min-w-[200px] bg-white p-4 rounded-lg shadow">
+                <h3 class="text-sm font-medium text-gray-500">Total Pemesanan</h3>
+                <p class="mt-2 text-3xl font-bold text-gray-800">{{ number_format($totalPemesanan) }}</p>
+            </div>
+
+            {{-- Total Pelanggan --}}
+            <div class="flex-1 min-w-[200px] bg-white p-4 rounded-lg shadow">
+                <h3 class="text-sm font-medium text-gray-500">Total Pelanggan</h3>
+                <p class="mt-2 text-3xl font-bold text-gray-800">{{ number_format($totalPelanggan) }}</p>
+            </div>
+
+            {{-- Total Karyawan --}}
+            <div class="flex-1 min-w-[200px] bg-white p-4 rounded-lg shadow">
+                <h3 class="text-sm font-medium text-gray-500">Total Karyawan</h3>
+                <p class="mt-2 text-3xl font-bold text-gray-800">{{ number_format($totalKaryawan) }}</p>
+            </div>
+
+            {{-- Pembayaran Paid --}}
+            <div class="flex-1 min-w-[200px] bg-white p-4 rounded-lg shadow">
+                <h3 class="text-sm font-medium text-gray-500">Pembayaran “Paid”</h3>
+                <p class="mt-2 text-3xl font-bold text-green-600">{{ number_format($totalPaid) }}</p>
+            </div>
+
+            {{-- Pembayaran Unpaid --}}
+            <div class="flex-1 min-w-[200px] bg-white p-4 rounded-lg shadow">
+                <h3 class="text-sm font-medium text-gray-500">Pembayaran “Unpaid”</h3>
+                <p class="mt-2 text-3xl font-bold text-red-600">{{ number_format($totalUnpaid) }}</p>
             </div>
         </div>
     </div>

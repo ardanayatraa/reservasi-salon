@@ -9,6 +9,7 @@ use App\Http\Controllers\PemesananController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\BookedController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\ShiftController;
@@ -44,8 +45,9 @@ Route::post('/logout',[CustomAuthenticatedSessionController::class, 'destroy'])
 Route::middleware(['auth','role:admin'])
     ->group(function(){
         // Dashboard
-        Route::get('/dashboard', fn() => view('admin.dashboard'))
-             ->name('dashboard');
+  Route::get('/dashboard', [DashboardController::class, 'index'])
+     ->name('dashboard');
+
 
         // CRUD resource controllers
      Route::resource('admin', AdminController::class)
@@ -77,6 +79,8 @@ Route::middleware(['auth','role:admin'])
 
         Route::get('laporan/pdf', [LaporanController::class, 'exportPdf'])
             ->name('laporan.pdf');
+
+
     });
 
 
