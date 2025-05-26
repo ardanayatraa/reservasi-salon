@@ -7,26 +7,34 @@
     <title>Dewi Beauty Salon | Pengalaman Kecantikan Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Midtrans Script -->
     <script type="text/javascript" src="{{ config('midtrans.snap_url') }}"
         data-client-key="{{ config('midtrans.client_key') }}"></script>
+
     <script>
-        // Cek menggunakan guard 'pelanggan'
+        // Global data untuk JavaScript
         window.isLoggedIn = @json(auth()->guard('pelanggan')->check());
+        window.userData = @json($user ?? null);
+        window.servicesData = @json($services ?? []);
+        window.shiftsData = @json($shifts ?? []);
+        window.timeSlotsData = @json($timeSlots ?? []);
     </script>
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#C68EFD', // Soft purple
-                        secondary: '#F9F5F0', // Cream white
+                        primary: '#FF6B9D',
+                        secondary: '#F9F5F0',
                         dark: '#1A1A1A',
                         light: '#FFFFFF',
-                        accent: '#FED2E2', // Warm pink
+                        accent: '#FED2E2',
                     },
                     fontFamily: {
                         sans: ['Poppins', 'sans-serif'],
@@ -36,6 +44,7 @@
             }
         }
     </script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&display=swap');
@@ -78,25 +87,25 @@
         }
 
         .btn-primary {
-            background-color: #C68EFD;
+            background-color: #FF6B9D;
             color: white;
             transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
-            background-color: #b57aec;
+            background-color: #ff5288;
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
         .btn-outline {
-            border: 2px solid #C68EFD;
-            color: #C68EFD;
+            border: 2px solid #FF6B9D;
+            color: #FF6B9D;
             transition: all 0.3s ease;
         }
 
         .btn-outline:hover {
-            background-color: #C68EFD;
+            background-color: #FF6B9D;
             color: white;
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -109,15 +118,6 @@
         .review-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        .google-maps-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            color: #5F6368;
-            margin-top: 12px;
         }
 
         /* Modal Styles */
@@ -191,14 +191,14 @@
         }
 
         .step.active {
-            background-color: #C68EFD;
-            border-color: #C68EFD;
+            background-color: #FF6B9D;
+            border-color: #FF6B9D;
             color: white;
         }
 
         .step.completed {
-            background-color: #C68EFD;
-            border-color: #C68EFD;
+            background-color: #FF6B9D;
+            border-color: #FF6B9D;
             color: white;
         }
 
@@ -212,7 +212,7 @@
 
         .progress-bar {
             height: 2px;
-            background-color: #C68EFD;
+            background-color: #FF6B9D;
             position: absolute;
             top: 50%;
             left: 0;
@@ -224,16 +224,78 @@
         .time-slot {
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .time-slot:hover {
-            border-color: #C68EFD;
-            background-color: #f9f5ff;
+            border-color: #FF6B9D;
+            background-color: #fff0f5;
         }
 
         .time-slot.selected {
-            border-color: #C68EFD;
-            background-color: #f9f5ff;
+            border-color: #FF6B9D;
+            background-color: #fff0f5;
+        }
+
+        .time-slot.unavailable {
+            background-color: #fee2e2 !important;
+            color: #dc2626 !important;
+            cursor: not-allowed !important;
+            opacity: 0.6;
+        }
+
+        .time-slot.unavailable:hover {
+            background-color: #fee2e2 !important;
+            border-color: #dc2626 !important;
+        }
+
+        .time-slot.checking {
+            background-color: #fef3c7;
+            border-color: #f59e0b;
+            cursor: wait;
+        }
+
+        /* Styling untuk layanan yang dipilih */
+        .selected-service {
+            background-color: #fff0f5;
+            border-left: 3px solid #FF6B9D;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .selected-service:hover {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Availability indicator */
+        .availability-indicator {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .availability-indicator.available {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .availability-indicator.unavailable {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .availability-indicator.checking {
+            background-color: #f59e0b;
+            color: white;
         }
     </style>
 </head>
@@ -255,19 +317,16 @@
                         class="text-dark hover:text-primary transition duration-300 font-light">Tentang</a>
                     <a href="#services"
                         class="text-dark hover:text-primary transition duration-300 font-light">Layanan</a>
-
                     <a href="#history"
                         class="text-dark hover:text-primary transition duration-300 font-light">History</a>
                 </div>
 
                 <div class="flex items-center space-x-4">
                     @guest('pelanggan')
-                        {{-- Belum login sebagai pelanggan --}}
                         <a href="/login" class="hidden md:block px-6 py-2 btn-outline rounded-sm font-light text-sm">
                             MASUK
                         </a>
                     @else
-                        {{-- Logout pelanggan --}}
                         <form action="/logout" method="POST" class="hidden md:block">
                             @csrf
                             <button type="submit" class="px-6 py-2 btn-outline rounded-sm font-light text-sm">
@@ -277,7 +336,6 @@
                     @endguest
 
                     @auth('admin')
-                        {{-- Jika login sebagai admin --}}
                         <a href="/dashboard" class="hidden md:block px-6 py-2 btn-outline rounded-sm font-light text-sm">
                             DASHBOARD ADMIN
                         </a>
@@ -287,7 +345,6 @@
                         <i class="fas fa-bars text-xl"></i>
                     </button>
                 </div>
-
             </div>
 
             <!-- Mobile Menu -->
@@ -295,17 +352,15 @@
                 <div class="flex flex-col space-y-4">
                     <a href="#home" class="text-dark hover:text-primary transition duration-300">Beranda</a>
                     <a href="#about" class="text-dark hover:text-primary transition duration-300">Tentang</a>
-                    <a href="#services"class="text-dark hover:text-primary transition duration-300">Layanan</a>
+                    <a href="#services" class="text-dark hover:text-primary transition duration-300">Layanan</a>
                     <a href="#history" class="text-dark hover:text-primary transition duration-300">History</a>
 
                     @guest('pelanggan')
-                        {{-- Tampilkan tombol Masuk --}}
                         <a href="/login"
                             class="block w-full text-center px-6 py-2 border border-primary rounded-sm font-light text-sm hover:bg-primary hover:text-white transition">
                             MASUK
                         </a>
                     @else
-                        {{-- Tampilkan tombol Keluar --}}
                         <form action="/logout" method="POST" class="w-full">
                             @csrf
                             <button type="submit"
@@ -316,7 +371,6 @@
                     @endguest
 
                     @auth('admin')
-                        {{-- Tampilkan link Dashboard Admin --}}
                         <a href="/dashboard"
                             class="block w-full text-center px-6 py-2 border border-primary rounded-sm font-light text-sm hover:bg-primary hover:text-white transition">
                             DASHBOARD ADMIN
@@ -324,7 +378,6 @@
                     @endauth
                 </div>
             </div>
-
         </div>
     </nav>
 
@@ -338,7 +391,7 @@
                 TINGKATKAN <br><span class="text-primary">KECANTIKAN ANDA</span>
             </h1>
             <p data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200"
-                class="text-lg md:text-xl text-white mb-10 max-wxl mx-auto font-light">
+                class="text-lg md:text-xl text-white mb-10 max-w-xl mx-auto font-light">
                 Nikmati perawatan kecantikan premium dalam lingkungan yang mewah dan menenangkan
             </p>
             <div data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400"
@@ -347,7 +400,7 @@
                     class="px-8 py-3 btn-primary rounded-sm font-light text-sm uppercase tracking-wider">
                     Layanan Kami
                 </a>
-                <a href="#contact"
+                <a href="#history"
                     class="px-8 py-3 border-2 border-white text-white rounded-sm font-light text-sm uppercase tracking-wider hover:bg-white hover:text-dark transition duration-300">
                     Reservasi
                 </a>
@@ -413,6 +466,7 @@
     </section>
 
     <!-- Services Section -->
+
     <section id="services" class="py-24 bg-secondary">
         <div class="container mx-auto px-6">
             <div class="text-center mb-16">
@@ -430,23 +484,22 @@
                     <div data-aos="fade-up" data-aos-delay="{{ $loop->index * 200 }}"
                         class="service-card bg-white shadow-sm">
                         <div class="relative h-64 overflow-hidden">
-                            <img src="{{ $service['foto'] }}" alt="{{ $service['foto'] }}"
-                                class="w-full h-full object-cover hover-scale">
+                            <img src="{{ $service->foto ?? 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80' }}"
+                                alt="{{ $service->nama_perawatan }}" class="w-full h-full object-cover hover-scale">
                         </div>
                         <div class="p-6">
-                            <h3 class="text-xl font-serif font-bold text-dark mb-2">{{ $service['nama_perawatan'] }}
-                            </h3>
+                            <h3 class="text-xl font-serif font-bold text-dark mb-2">{{ $service->nama_perawatan }}</h3>
                             <p class="text-gray-600 mb-4 text-sm">
-                                {{ $service['deskripsi'] }}
+                                {{ $service->deskripsi ?? 'Perawatan premium untuk kecantikan Anda' }}
                             </p>
                             <div class="flex justify-between items-center">
                                 <span class="text-primary font-serif text-xl">Rp
-                                    {{ number_format($service['harga'], 0, ',', '.') }}</span>
+                                    {{ number_format($service->harga, 0, ',', '.') }}</span>
                                 <button
                                     class="text-primary hover:text-accent transition duration-300 text-sm book-service-btn"
-                                    data-service="{{ $service['id_perawatan'] }}"
-                                    data-name="{{ $service['nama_perawatan'] }}"
-                                    data-price="{{ $service['harga'] }}" data-duration="{{ $service['waktu'] }}">
+                                    data-service="{{ $service->id_perawatan }}"
+                                    data-name="{{ $service->nama_perawatan }}" data-price="{{ $service->harga }}"
+                                    data-duration="{{ $service->waktu }}">
                                     Reservasi <i class="fas fa-arrow-right ml-1"></i>
                                 </button>
                             </div>
@@ -456,15 +509,13 @@
             </div>
 
             <div class="text-center mt-12">
-                <a href="#contact"
+                <a href="#history"
                     class="inline-block px-8 py-3 btn-primary rounded-sm font-light text-sm uppercase tracking-wider">
                     Lihat Semua Layanan
                 </a>
             </div>
         </div>
     </section>
-
-
 
     <!-- Testimonials Section -->
     <section id="testimonials" class="py-24 bg-white">
@@ -487,7 +538,6 @@
                     <span class="mx-3 text-gray-400">|</span>
                     <span class="text-gray-600">Berdasarkan 52 ulasan</span>
                 </div>
-
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -601,7 +651,7 @@
                     Manjakan diri Anda dengan layanan premium kami dan temukan perbedaan yang dibuat oleh kemewahan.
                 </p>
                 <div data-aos="fade-up" data-aos-delay="400">
-                    <a href="#contact"
+                    <a href="#history"
                         class="inline-block px-8 py-3 btn-primary rounded-sm font-light text-sm uppercase tracking-wider">
                         Reservasi Sekarang
                     </a>
@@ -610,7 +660,7 @@
         </div>
     </section>
 
-    <!-- Contact Section -->
+    <!-- History Section -->
     <section id="history" class="py-24 bg-white">
         <div class="container mx-auto px-6">
             <div class="text-center mb-16">
@@ -648,8 +698,27 @@
                         @if ($histories->count())
                             <div class="overflow-x-auto">
                                 <table class="min-w-full bg-white shadow-sm rounded-sm">
-                                    <thead>
-                                        <!-- ... kepala tabel tetap sama ... -->
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th
+                                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                No</th>
+                                            <th
+                                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Tanggal</th>
+                                            <th
+                                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Waktu</th>
+                                            <th
+                                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Layanan</th>
+                                            <th
+                                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Total</th>
+                                            <th
+                                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Status</th>
+                                        </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($histories as $idx => $order)
@@ -660,11 +729,27 @@
                                                     {{ \Carbon\Carbon::parse($order->tanggal_pemesanan)->format('d M Y') }}
                                                 </td>
                                                 <td class="px-4 py-2 text-sm">{{ $order->waktu }}</td>
-                                                <td class="px-4 py-2 text-sm">{{ $order->perawatan->nama_perawatan }}
+                                                <td class="px-4 py-2 text-sm">
+                                                    @if ($order->bookeds->count() > 0)
+                                                        @foreach ($order->bookeds as $booked)
+                                                            {{ $booked->perawatan->nama_perawatan }}@if (!$loop->last)
+                                                                ,
+                                                            @endif
+                                                        @endforeach
+                                                    @else
+                                                        -
+                                                    @endif
                                                 </td>
                                                 <td class="px-4 py-2 text-sm">Rp
                                                     {{ number_format($order->total, 0, ',', '.') }}</td>
-                                                <td class="px-4 py-2 text-sm uppercase">{{ $order->status_pemesanan }}
+                                                <td class="px-4 py-2 text-sm">
+                                                    <span
+                                                        class="px-2 py-1 text-xs rounded-full
+                                                        @if ($order->status_pemesanan == 'confirmed') bg-green-100 text-green-800
+                                                        @elseif($order->status_pemesanan == 'pending') bg-yellow-100 text-yellow-800
+                                                        @else bg-red-100 text-red-800 @endif">
+                                                        {{ ucfirst($order->status_pemesanan) }}
+                                                    </span>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -674,7 +759,7 @@
 
                             {{-- Pagination links --}}
                             <div class="mt-4">
-                                {{ $histories->links('vendor.pagination.tailwind') }}
+                                {{ $histories->links() }}
                             </div>
                         @else
                             <p class="text-center text-gray-600">
@@ -682,10 +767,9 @@
                             </p>
                         @endif
                     @endif
-
                 </div>
 
-                {{-- Kolom Kanan: Informasi Kontak (TIDAK DIUBAH) --}}
+                {{-- Kolom Kanan: Informasi Kontak --}}
                 <div data-aos="fade-left">
                     <div class="mb-8">
                         <h3 class="text-2xl font-serif font-bold text-dark mb-6">Informasi Kontak</h3>
@@ -710,9 +794,7 @@
                                 </div>
                                 <div>
                                     <h4 class="font-serif font-bold text-dark mb-2">Nomor Telepon</h4>
-                                    <p class="text-gray-600 text-sm">
-                                        +62 878-6178-6535
-                                    </p>
+                                    <p class="text-gray-600 text-sm">+62 878-6178-6535</p>
                                 </div>
                             </div>
 
@@ -722,9 +804,7 @@
                                 </div>
                                 <div>
                                     <h4 class="font-serif font-bold text-dark mb-2">Alamat Email</h4>
-                                    <p class="text-gray-600 text-sm">
-                                        info@dewibeautysalon.com
-                                    </p>
+                                    <p class="text-gray-600 text-sm">info@dewibeautysalon.com</p>
                                 </div>
                             </div>
 
@@ -734,9 +814,7 @@
                                 </div>
                                 <div>
                                     <h4 class="font-serif font-bold text-dark mb-2">Jam Buka</h4>
-                                    <p class="text-gray-600 text-sm">
-                                        Buka setiap hari: 9:00 - 21:00
-                                    </p>
+                                    <p class="text-gray-600 text-sm">Buka setiap hari: 9:00 - 21:00</p>
                                 </div>
                             </div>
                         </div>
@@ -744,7 +822,6 @@
 
                     <div>
                         <h3 class="text-2xl font-serif font-bold text-dark mb-6">Ikuti Kami</h3>
-
                         <div class="flex space-x-4">
                             <a href="#"
                                 class="w-10 h-10 border border-primary text-primary hover:bg-primary hover:text-white flex items-center justify-center transition duration-300">
@@ -768,7 +845,6 @@
             </div>
         </div>
     </section>
-
 
     <!-- Footer -->
     <footer class="bg-dark text-white py-12">
@@ -811,11 +887,8 @@
                         <li><a href="#services"
                                 class="text-gray-400 hover:text-primary transition duration-300 text-sm">Layanan</a>
                         </li>
-                        <li><a href="#gallery"
-                                class="text-gray-400 hover:text-primary transition duration-300 text-sm">Galeri</a>
-                        </li>
-                        <li><a href="#contact"
-                                class="text-gray-400 hover:text-primary transition duration-300 text-sm">Kontak</a>
+                        <li><a href="#history"
+                                class="text-gray-400 hover:text-primary transition duration-300 text-sm">Riwayat</a>
                         </li>
                     </ul>
                 </div>
@@ -823,17 +896,11 @@
                 <div>
                     <h3 class="text-lg font-serif font-bold mb-6">Layanan</h3>
                     <ul class="space-y-3">
-                        @foreach ($services as $service)
+                        @foreach ($services->take(4) as $service)
                             <li><a href="#services"
-                                    class="text-gray-400 hover:text-primary transition duration-300 text-sm">{{ $service['nama_perawatan'] }}</a>
+                                    class="text-gray-400 hover:text-primary transition duration-300 text-sm">{{ $service->nama_perawatan }}</a>
                             </li>
                         @endforeach
-                        <li><a href="#services"
-                                class="text-gray-400 hover:text-primary transition duration-300 text-sm">Perawatan
-                                Tubuh</a></li>
-                        <li><a href="#services"
-                                class="text-gray-400 hover:text-primary transition duration-300 text-sm">Perawatan
-                                Kuku</a></li>
                     </ul>
                 </div>
 
@@ -883,68 +950,92 @@
                     <div class="progress-bar" id="progress-bar"></div>
                     <div class="step active" data-step="1">1</div>
                     <div class="step" data-step="2">2</div>
-                    <div class="step" data-step="3">3</div>
                 </div>
 
                 <!-- Step Labels -->
                 <div class="flex justify-between text-sm text-gray-600 mb-8 px-4">
                     <div class="text-center" style="width: 100px; margin-left: -30px;">Detail & Waktu</div>
                     <div class="text-center" style="width: 100px; margin-left: -30px;">Pembayaran</div>
-                    <div class="text-center" style="width: 100px; margin-left: -30px;">Konfirmasi</div>
                 </div>
 
                 <form id="booking-form" action="{{ route('book.service') }}" method="POST">
                     @csrf
-                    <input type="hidden" id="service-id" name="service" value="">
+                    <input type="hidden" id="booking-date" name="booking_date" value="{{ date('Y-m-d') }}">
+                    <input type="hidden" id="selected-time" name="booking_time" value="">
 
-                    <!-- Step 1: Package Details & Time Selection -->
+                    <!-- Step 1: Detail Paket & Pilih Waktu -->
                     <div class="step-content active" id="step-1">
-                        <div class="bg-white rounded-lg">
-                            <h3 class="text-2xl font-serif font-bold text-dark mb-6">Detail Paket & Pilih Waktu</h3>
+                        <h3 class="text-2xl font-serif font-bold text-dark mb-6">Pilih Layanan & Waktu</h3>
 
-                            <div class="mb-6">
-                                <div class="bg-secondary p-4 rounded-md mb-6">
-                                    <div class="flex items-center">
-                                        <div class="w-24 h-24 rounded-md overflow-hidden mr-4">
-                                            <img id="package-image" src="/placeholder.svg" alt="Package Image"
-                                                class="w-full h-full object-cover">
-                                        </div>
-                                        <div>
-                                            <h4 id="package-name" class="font-serif font-bold text-lg mb-1"></h4>
-                                            <p id="package-price" class="text-primary font-serif"></p>
-                                            <p id="package-duration" class="text-sm text-gray-600"></p>
-                                        </div>
-                                    </div>
-                                    <div class="mt-4">
-                                        <p id="package-description" class="text-sm text-gray-600"></p>
-                                    </div>
-                                </div>
+                        <!-- Container untuk layanan yang dipilih -->
+                        <div id="selected-services-container" class="mb-6">
+                            <!-- Layanan yang dipilih akan ditampilkan di sini -->
+                        </div>
+
+                        {{-- Container dinamis untuk baris layanan --}}
+                        <div id="services-container" class="space-y-3 mb-6">
+                            {{-- Baris template pertama --}}
+                            <div class="service-row flex items-center space-x-2">
+                                <select name="service_select" class="service-select border p-2 rounded flex-1">
+                                    <option value="">-- Pilih Layanan --</option>
+                                    @foreach ($services as $s)
+                                        <option value="{{ $s->id_perawatan }}" data-id="{{ $s->id_perawatan }}"
+                                            data-name="{{ $s->nama_perawatan }}" data-price="{{ $s->harga }}"
+                                            data-duration="{{ $s->waktu }}">
+                                            {{ $s->nama_perawatan }} ({{ $s->waktu }} menit)
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <button type="button"
+                                    class="add-to-selected px-3 py-1 bg-primary text-white rounded hover:bg-accent transition">
+                                    Tambah
+                                </button>
                             </div>
+                        </div>
 
-                            <div class="mb-6">
-                                <label for="booking-date" class="block text-sm font-medium text-gray-700 mb-2">Tanggal
-                                    Booking</label>
-                                <input type="date" id="booking-date" name="date"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                            </div>
+                        <button type="button" id="add-service-row" class="mb-4 text-primary hover:underline">
+                            + Tambah Layanan Lainnya
+                        </button>
 
-                            <div class="mb-6">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Waktu Tersedia</label>
-                                <div class="grid grid-cols-3 gap-3">
-                                    @foreach ($timeSlots as $time)
-                                        <div class="time-slot border border-gray-300 rounded-md p-3 text-center"
-                                            data-time="{{ $time }}">
+                        {{-- Info Durasi --}}
+                        <div class="mb-4 text-sm text-gray-700">
+                            Total durasi: <span id="displayDurasi">0</span> menit
+                            &nbsp;|&nbsp;
+                            Selesai (jika mulai dipilih): <span id="displayEnd">–</span>
+                        </div>
+
+                        <!-- Employee availability info -->
+                        <div id="employee-info" class="mb-4"></div>
+
+                        {{-- Pilih Shift & Slot --}}
+                        @foreach ($shifts as $shift)
+                            <div class="mb-6 shift-block" data-shift-id="{{ $shift->id_shift }}"
+                                data-end="{{ \Carbon\Carbon::parse($shift->end_time)->format('H:i') }}">
+                                <h4 class="font-semibold mb-2">
+                                    {{ $shift->nama_shift }}
+                                    <span class="text-sm text-gray-500">
+                                        ({{ \Carbon\Carbon::parse($shift->start_time)->format('H:i') }}
+                                        – {{ \Carbon\Carbon::parse($shift->end_time)->format('H:i') }})
+                                    </span>
+                                </h4>
+                                <div class="grid grid-cols-5 gap-2">
+                                    @foreach ($timeSlots[$shift->nama_shift] as $time)
+                                        <div class="time-slot border p-3 text-center cursor-pointer relative"
+                                            data-time="{{ $time }}"
+                                            onclick="selectSlot('{{ $shift->id_shift }}','{{ $time }}')">
                                             {{ $time }}
+                                            <div class="availability-indicator" style="display: none;"></div>
                                         </div>
                                     @endforeach
                                 </div>
-                                <input type="hidden" id="selected-time" name="time" value="">
                             </div>
+                        @endforeach
 
-                            <div class="flex justify-end">
-                                <button type="button" id="next-to-step-2"
-                                    class="px-6 py-2 btn-primary rounded-md">Lanjutkan</button>
-                            </div>
+                        <div class="flex justify-end">
+                            <button type="button" id="next-to-step-2" class="px-6 py-2 btn-primary rounded-md"
+                                disabled>
+                                Lanjutkan
+                            </button>
                         </div>
                     </div>
 
@@ -996,7 +1087,6 @@
                                             </p>
                                         </div>
                                     </div>
-
                                 </div>
 
                                 <div>
@@ -1004,9 +1094,8 @@
 
                                     <div class="bg-gray-50 p-4 rounded-md mb-6">
                                         <div class="space-y-3">
-                                            <div class="flex justify-between">
-                                                <span class="text-gray-600">Layanan:</span>
-                                                <span class="font-medium" id="summary-service">-</span>
+                                            <div id="summary-services-list" class="mb-3">
+                                                <!-- Daftar layanan akan ditampilkan di sini -->
                                             </div>
                                             <div class="flex justify-between">
                                                 <span class="text-gray-600">Tanggal:</span>
@@ -1038,8 +1127,7 @@
                                             </label>
                                         </div>
                                         <p class="text-xs text-gray-500">*Pembayaran akan diproses melalui gateway
-                                            Midtrans
-                                            yang aman.</p>
+                                            Midtrans yang aman.</p>
                                     </div>
                                 </div>
                             </div>
@@ -1071,13 +1159,7 @@
                             <div class="space-y-3">
                                 <div class="flex justify-between">
                                     <span class="text-gray-600">ID Reservasi:</span>
-                                    <span class="font-medium" id="reservation-id">
-                                        @if (session('reservation_id'))
-                                            {{ session('reservation_id') }}
-                                        @else
-                                            DBS-2024-0001
-                                        @endif
-                                    </span>
+                                    <span class="font-medium" id="reservation-id">DBS-2024-0001</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600">Nama:</span>
@@ -1112,6 +1194,73 @@
         </div>
     </div>
 
+    @if (session('status_message'))
+        <div x-data="{ show: true }" x-show="show" x-transition
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="z-index: 9999;">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
+                <button @click="show = false"
+                    class="absolute top-3 right-4 text-gray-500 hover:text-gray-700 text-xl">&times;</button>
+
+                <div class="text-center">
+                    <div class="text-green-500 text-5xl mb-4">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3 class="text-2xl font-serif font-bold text-dark mb-2">Transaksi Berhasil!</h3>
+                    <p class="text-gray-600 mb-6">{{ session('status_message') }}</p>
+
+                    <div class="bg-secondary p-4 rounded text-left text-sm mb-6">
+                        <h4 class="font-serif font-semibold mb-2">Detail Reservasi</h4>
+
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">ID Reservasi:</span>
+                                <span class="font-medium" id="s3-id">–</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Nama:</span>
+                                <span class="font-medium" id="s3-nama">–</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Layanan:</span>
+                                <span class="font-medium" id="s3-layanan">–</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Tanggal & Waktu:</span>
+                                <span class="font-medium" id="s3-jadwal">–</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Total:</span>
+                                <span class="font-medium text-primary" id="s3-total">–</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button @click="show = false"
+                        class="px-6 py-2 bg-primary text-white rounded-md hover:bg-pink-600 transition">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const booking = JSON.parse(localStorage.getItem("bookingData") || "{}")
+
+                document.getElementById("s3-id").textContent = booking.orderId || "-"
+                document.getElementById("s3-nama").textContent = booking.customerName || "-"
+                document.getElementById("s3-layanan").textContent = booking.serviceName || "-"
+                document.getElementById("s3-jadwal").textContent =
+                    (booking.bookingDate || "-") + ", " + (booking.bookingTime || "-")
+                document.getElementById("s3-total").textContent =
+                    booking.price ? "Rp " + booking.price.toLocaleString("id-ID") : "-"
+
+                // Hapus setelah tampil (opsional)
+                localStorage.removeItem("bookingData")
+            })
+        </script>
+    @endif
+
     <!-- AOS Script -->
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
@@ -1121,408 +1270,7 @@
     </script>
 
     <!-- Main Script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Mobile Menu Toggle
-            const menuToggle = document.getElementById('menu-toggle');
-            const mobileMenu = document.getElementById('mobile-menu');
-
-            if (menuToggle && mobileMenu) {
-                menuToggle.addEventListener('click', () => {
-                    mobileMenu.classList.toggle('hidden');
-                });
-            }
-
-            // Back to Top Button
-            window.addEventListener('scroll', function() {
-                var backToTopButton = document.querySelector('a[href="#home"]');
-                if (document.documentElement.scrollTop > 300) {
-                    backToTopButton.classList.remove('hidden');
-                } else {
-                    backToTopButton.classList.add('hidden');
-                }
-            });
-
-            // Booking Modal
-            const modal = document.getElementById('booking-modal');
-            const bookButtons = document.querySelectorAll('.book-service-btn');
-            const closeBtn = document.querySelector('.modal-close');
-            const progressBar = document.getElementById('progress-bar');
-            const steps = document.querySelectorAll('.step');
-            const stepContents = document.querySelectorAll('.step-content');
-            const bookingForm = document.getElementById('booking-form');
-
-            // Service Data (akan diisi dari data-attributes)
-            let bookingData = {
-                service: null,
-                serviceName: null,
-                price: null,
-                duration: null,
-                date: null,
-                time: null
-            };
-
-            // Function to set active step
-            function setActiveStep(stepNumber) {
-                steps.forEach(step => step.classList.remove('active', 'completed'));
-                stepContents.forEach(content => content.classList.remove('active'));
-
-                for (let i = 0; i < stepNumber; i++) {
-                    steps[i].classList.add('completed');
-                }
-
-                steps[stepNumber].classList.add('active');
-                stepContents[stepNumber].classList.add('active');
-
-                const progress = ((stepNumber) / (steps.length - 1)) * 100;
-                progressBar.style.width = progress + '%';
-            }
-
-            // Function to go to step
-            function goToStep(stepNumber) {
-                setActiveStep(stepNumber - 1);
-            }
-
-            // Event listeners for booking buttons
-            if (bookButtons.length > 0) {
-                bookButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        const service = this.dataset.service;
-                        const name = this.dataset.name;
-                        const price = parseInt(this.dataset.price);
-                        const duration = this.dataset.duration;
-
-                        bookingData.service = service;
-                        bookingData.serviceName = name;
-                        bookingData.price = price;
-                        bookingData.duration = duration;
-
-                        // Set hidden input value
-                        document.getElementById('service-id').value = service;
-
-                        openModal();
-                    });
-                });
-            }
-
-            // Function to open modal
-            function openModal() {
-                if (!window.isLoggedIn) {
-                    window.location.href = '/login';
-                    return;
-                }
-
-                if (modal) {
-                    modal.style.display = 'block';
-                    document.body.style.overflow = 'hidden'; // Prevent scrolling
-                    resetBookingForm();
-
-                    // Display package details immediately in step 1
-                    const serviceData = getServiceData(bookingData.service);
-                    if (serviceData) {
-                        document.getElementById('package-image').src = serviceData.image;
-                        document.getElementById('package-name').textContent = bookingData.serviceName;
-                        document.getElementById('package-price').textContent = formatPrice(bookingData.price);
-                        document.getElementById('package-duration').textContent = serviceData.duration;
-                        document.getElementById('package-description').textContent = serviceData.description;
-                    }
-                }
-            }
-
-            // Function to close modal
-            function closeModal() {
-                if (modal) {
-                    modal.style.display = 'none';
-                    document.body.style.overflow = 'auto'; // Enable scrolling
-                    localStorage.removeItem('bookingData');
-                    history.replaceState(null, '', window.location.pathname);
-                    Object.assign(bookingData);
-                    resetBookingForm();
-                    goToStep(1);
-                }
-            }
-
-            // Event listener for close button
-            if (closeBtn) {
-                closeBtn.addEventListener('click', closeModal);
-            }
-
-            // Event listener for closing modal when clicking outside
-            if (modal) {
-                window.addEventListener('click', (event) => {
-                    if (event.target == modal) {
-                        closeModal();
-                    }
-                });
-            }
-
-            // Time slot selection
-            document.addEventListener('click', function(event) {
-                if (event.target.classList.contains('time-slot')) {
-                    document.querySelectorAll('.time-slot').forEach(slot => slot.classList.remove(
-                        'selected'));
-                    event.target.classList.add('selected');
-                    bookingData.time = event.target.dataset.time;
-
-                    // Set hidden input value
-                    document.getElementById('selected-time').value = bookingData.time;
-                }
-            });
-
-            // Next button for Step 1
-            const nextToStep2Button = document.getElementById('next-to-step-2');
-            if (nextToStep2Button) {
-                nextToStep2Button.addEventListener('click', function() {
-                    const dateInput = document.getElementById('booking-date');
-                    const selectedTimeSlot = document.querySelector('.time-slot.selected');
-
-                    if (!dateInput.value) {
-                        alert('Silakan pilih tanggal booking.');
-                        return;
-                    }
-
-                    if (!selectedTimeSlot) {
-                        alert('Silakan pilih waktu booking.');
-                        return;
-                    }
-
-                    bookingData.date = dateInput.value;
-
-                    // Update summary in Step 2
-                    document.getElementById('summary-service').textContent = bookingData.serviceName;
-                    document.getElementById('summary-date').textContent = formatDate(bookingData.date);
-                    document.getElementById('summary-time').textContent = bookingData.time;
-                    document.getElementById('summary-price').textContent = formatPrice(bookingData.price);
-
-                    goToStep(2);
-                });
-            }
-
-            // Back button for Step 2
-            const backToStep1Button = document.getElementById('back-to-step-1');
-            if (backToStep1Button) {
-                backToStep1Button.addEventListener('click', function() {
-                    goToStep(1);
-                });
-            }
-
-            // Pay button for Midtrans integration
-            const payButton = document.getElementById('pay-button');
-            if (payButton) {
-                payButton.addEventListener('click', function() {
-                    // Tampilkan loading
-                    payButton.disabled = true;
-                    payButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-
-                    // Kumpulkan data untuk dikirim ke server
-                    const formData = new FormData(bookingForm);
-                    formData.append('service_id', bookingData.service);
-                    formData.append('service_name', bookingData.serviceName);
-                    formData.append('price', bookingData.price);
-                    formData.append('booking_date', bookingData.date);
-                    formData.append('booking_time', bookingData.time);
-
-                    // Kirim data ke server untuk mendapatkan token Midtrans
-                    fetch('/book-service', {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    .getAttribute('content')
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                // Simpan data booking untuk digunakan setelah pembayaran
-                                localStorage.setItem('bookingData', JSON.stringify({
-                                    orderId: data.order_id,
-                                    customerName: "{{ $user->nama_lengkap ?? '' }}",
-                                    serviceName: bookingData.serviceName,
-                                    bookingDate: formatDate(bookingData.date),
-                                    bookingTime: bookingData.time,
-                                    price: bookingData.price
-                                }));
-
-                                // Buka Snap Midtrans
-                                window.snap.pay(data.snap_token, {
-                                    onSuccess: function(result) {
-                                        window.location.href =
-                                            '/payment/finish?status=success&order_id=' +
-                                            data.order_id;
-                                    },
-                                    onPending: function(result) {
-                                        window.location.href =
-                                            '/payment/finish?status=pending&order_id=' +
-                                            data.order_id;
-                                    },
-                                    onError: function(result) {
-                                        window.location.href =
-                                            '/payment/finish?status=error&order_id=' + data
-                                            .order_id;
-                                    },
-                                    onClose: function() {
-                                        payButton.disabled = false;
-                                        payButton.innerHTML = 'Bayar Sekarang';
-                                        alert(
-                                            'Anda menutup popup pembayaran sebelum menyelesaikan transaksi.'
-                                        );
-                                    }
-                                });
-
-                            } else {
-                                alert(data.message || 'Terjadi kesalahan. Silakan coba lagi.');
-                                payButton.disabled = false;
-                                payButton.innerHTML = 'Bayar Sekarang';
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Terjadi kesalahan. Silakan coba lagi.');
-                            payButton.disabled = false;
-                            payButton.innerHTML = 'Bayar Sekarang';
-                        });
-                });
-            }
-
-            // Close booking
-            const closeBookingButton = document.getElementById('close-booking');
-            if (closeBookingButton) {
-                closeBookingButton.addEventListener('click', closeModal);
-            }
-
-            // Helper Functions
-            function resetBookingForm() {
-                // Reset time slots
-                document.querySelectorAll('.time-slot').forEach(slot => slot.classList.remove('selected'));
-
-                // Reset date input
-                const dateInput = document.getElementById('booking-date');
-                if (dateInput) dateInput.value = '';
-
-                // Reset hidden time input
-                const selectedTime = document.getElementById('selected-time');
-                if (selectedTime) selectedTime.value = '';
-            }
-
-            function formatPrice(price) {
-                return 'Rp ' + price.toLocaleString('id-ID');
-            }
-
-            function formatDate(dateString) {
-                const date = new Date(dateString);
-                const options = {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                };
-                return date.toLocaleDateString('id-ID', options);
-            }
-
-            function getServiceData(serviceId) {
-                // This function would normally fetch from an API or database
-                // For simplicity, we're using data attributes from the buttons
-                const button = document.querySelector(`.book-service-btn[data-service="${serviceId}"]`);
-                if (!button) return null;
-
-                return {
-                    id: serviceId,
-                    name: button.dataset.name,
-                    price: parseInt(button.dataset.price),
-                    duration: button.dataset.duration,
-                    description: button.closest('.service-card').querySelector('p').textContent.trim(),
-                    image: button.closest('.service-card').querySelector('img').src
-                };
-            }
-
-            // Check if we need to show success message (after form submission)
-            const urlParams = new URLSearchParams(window.location.search);
-            const paymentStatus = urlParams.get('status');
-            const orderId = urlParams.get('order_id');
-
-            if (paymentStatus && orderId) {
-                // Ambil data booking dari localStorage
-                const savedBookingData = JSON.parse(localStorage.getItem('bookingData') || '{}');
-
-                if (paymentStatus === 'success') {
-                    // Tampilkan modal sukses
-                    if (modal) {
-                        modal.style.display = 'block';
-                        document.body.style.overflow = 'hidden';
-
-                        // Go to success step
-                        goToStep(3);
-
-                        // Set reservation details
-                        document.getElementById('reservation-id').textContent = savedBookingData.orderId || orderId;
-                        document.getElementById('reservation-name').textContent = savedBookingData.customerName ||
-                            "{{ $user->nama_lengkap ?? '-' }}";
-                        document.getElementById('reservation-service').textContent = savedBookingData.serviceName ||
-                            '-';
-                        document.getElementById('reservation-datetime').textContent =
-                            (savedBookingData.bookingDate ? savedBookingData.bookingDate + ', ' : '') +
-                            (savedBookingData.bookingTime || '-');
-                        document.getElementById('reservation-price').textContent =
-                            savedBookingData.price ? formatPrice(savedBookingData.price) : '-';
-                    }
-
-                    // Hapus data dari localStorage setelah digunakan
-                    localStorage.removeItem('bookingData');
-                } else if (paymentStatus === 'pending') {
-                    // Tampilkan notifikasi pending
-                    const notification = document.createElement('div');
-                    notification.id = 'info-notification';
-                    notification.className =
-                        'fixed top-20 right-4 bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded shadow-md z-50';
-                    notification.innerHTML = `
-                <div class="flex items-center">
-                    <div class="py-1 mr-3"><i class="fas fa-info-circle text-xl"></i></div>
-                    <div>
-                        <p class="font-bold">Pembayaran Tertunda</p>
-                        <p class="text-sm">Pembayaran Anda sedang diproses. Kami akan mengirimkan konfirmasi setelah pembayaran selesai.</p>
-                    </div>
-                </div>
-            `;
-                    document.body.appendChild(notification);
-
-                    // Auto-hide notification after 5 seconds
-                    setTimeout(() => {
-                        notification.style.opacity = '0';
-                        notification.style.transition = 'opacity 0.5s ease';
-                        setTimeout(() => {
-                            notification.remove();
-                        }, 500);
-                    }, 5000);
-                } else if (paymentStatus === 'error') {
-                    // Tampilkan notifikasi error
-                    const notification = document.createElement('div');
-                    notification.id = 'error-notification';
-                    notification.className =
-                        'fixed top-20 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-md z-50';
-                    notification.innerHTML = `
-                <div class="flex items-center">
-                    <div class="py-1 mr-3"><i class="fas fa-exclamation-circle text-xl"></i></div>
-                    <div>
-                        <p class="font-bold">Pembayaran Gagal</p>
-                        <p class="text-sm">Terjadi kesalahan dalam proses pembayaran. Silakan coba lagi.</p>
-                    </div>
-                </div>
-            `;
-                    document.body.appendChild(notification);
-
-                    // Auto-hide notification after 5 seconds
-                    setTimeout(() => {
-                        notification.style.opacity = '0';
-                        notification.style.transition = 'opacity 0.5s ease';
-                        setTimeout(() => {
-                            notification.remove();
-                        }, 500);
-                    }, 5000);
-                }
-            }
-        });
-    </script>
+    <script src="{{ asset('js/script.js') }}"></script>
 </body>
 
 </html>

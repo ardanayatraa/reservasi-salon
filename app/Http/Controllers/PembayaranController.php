@@ -23,7 +23,6 @@ class PembayaranController extends Controller
     public function store(Request $request)
     {
         $v = $request->validate([
-            'id_user'           => 'required|exists:users,id',
             'id_layanan'        => 'required|exists:perawatans,id_perawatan',
             'tanggal_pembayaran'=> 'required|date',
             'total_harga'       => 'required|numeric',
@@ -54,7 +53,6 @@ class PembayaranController extends Controller
     public function update(Request $request, Pembayaran $pembayaran)
     {
         $v = $request->validate([
-            'id_user'           => 'required|exists:users,id',
             'id_layanan'        => 'required|exists:perawatans,id_perawatan',
             'tanggal_pembayaran'=> 'required|date',
             'total_harga'       => 'required|numeric',

@@ -11,7 +11,7 @@ class CreatePembayaransTable extends Migration
         Schema::create('pembayarans', function (Blueprint $table) {
             $table->increments('id_pembayaran');
             $table->unsignedInteger('id_pemesanan');
-            $table->timestamp('tanggal_pembayaran');
+            $table->timestamp('tanggal_pembayaran')->nullable();
             $table->decimal('total_harga', 15, 2);
             $table->string('status_pembayaran');
             $table->string('metode_pembayaran');

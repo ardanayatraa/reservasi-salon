@@ -1,7 +1,11 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Tambah Pelanggan</h2>
-    </x-slot>
+    <div class="px-4 py-6 sm:px-6 mb-4 lg:px-8 bg-white shadow sm:rounded-lg flex justify-between items-center">
+        <h2 class="font-semibold text-xl text-gray-800">
+            Tambah Pelanggan
+        </h2>
+
+    </div>
+
 
     <div class="py-6">
         <div class="w-full  bg-white shadow-sm rounded-lg p-6">
@@ -55,6 +59,10 @@
 
                 <div class="mt-6 flex justify-end">
                     <x-button>Simpan</x-button>
+                    <a href="{{ route('pelanggan.index') }}"
+                        class="ml-2 inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
+                        Batal
+                    </a>
                 </div>
             </form>
         </div>

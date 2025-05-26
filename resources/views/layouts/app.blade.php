@@ -78,18 +78,8 @@
 
             <div class="flex items-center space-x-4">
                 <div class="relative">
-                    <button class="text-gray-500 focus:outline-none">
-                        <i class="fas fa-bell"></i>
-                        <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
-                    </button>
-                </div>
-
-                <div class="relative">
                     <button class="flex items-center focus:outline-none">
-                        <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Admin"
-                            class="w-8 h-8 rounded-full">
                         <span class="ml-2 text-sm font-medium text-gray-700 hidden md:block">Admin</span>
-                        <i class="fas fa-chevron-down ml-1 text-xs text-gray-500"></i>
                     </button>
                 </div>
             </div>
@@ -120,7 +110,7 @@
                     {{-- Admin --}}
                     <a href="{{ route('admin.index') }}"
                         class="flex items-center px-4 py-3 rounded-sm
-                       {{ request()->routeIs('admin.index')
+                       {{ request()->routeIs('admin.*')
                            ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                            : 'text-sidebar-text hover:text-sidebar-hover' }}">
                         <i class="fas fa-user-shield w-5"></i>
@@ -130,7 +120,7 @@
                     {{-- Booked --}}
                     <a href="{{ route('booked.index') }}"
                         class="flex items-center px-4 py-3 rounded-sm
-                       {{ request()->routeIs('admin.booked.index')
+                       {{ request()->routeIs('booked.*')
                            ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                            : 'text-sidebar-text hover:text-sidebar-hover' }}">
                         <i class="fas fa-calendar-check w-5"></i>
@@ -140,7 +130,7 @@
                     {{-- Pelanggan --}}
                     <a href="{{ route('pelanggan.index') }}"
                         class="flex items-center px-4 py-3 rounded-sm
-                       {{ request()->routeIs('admin.pelanggan.index')
+                       {{ request()->routeIs('pelanggan.*')
                            ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                            : 'text-sidebar-text hover:text-sidebar-hover' }}">
                         <i class="fas fa-user w-5"></i>
@@ -150,7 +140,7 @@
                     {{-- Pembayaran --}}
                     <a href="{{ route('pembayaran.index') }}"
                         class="flex items-center px-4 py-3 rounded-sm
-                       {{ request()->routeIs('admin.pembayaran.index')
+                       {{ request()->routeIs('pembayaran.*')
                            ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                            : 'text-sidebar-text hover:text-sidebar-hover' }}">
                         <i class="fas fa-credit-card w-5"></i>
@@ -160,7 +150,7 @@
                     {{-- Pemesanan --}}
                     <a href="{{ route('pemesanan.index') }}"
                         class="flex items-center px-4 py-3 rounded-sm
-                       {{ request()->routeIs('admin.pemesanan.index')
+                       {{ request()->routeIs('pemesanan.*')
                            ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                            : 'text-sidebar-text hover:text-sidebar-hover' }}">
                         <i class="fas fa-shopping-cart w-5"></i>
@@ -170,42 +160,117 @@
                     {{-- Perawatan --}}
                     <a href="{{ route('perawatan.index') }}"
                         class="flex items-center px-4 py-3 rounded-sm
-                       {{ request()->routeIs('perawatan.index')
+                       {{ request()->routeIs('perawatan.*')
                            ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                            : 'text-sidebar-text hover:text-sidebar-hover' }}">
                         <i class="fas fa-spa w-5"></i>
                         <span class="ml-3">Perawatan</span>
                     </a>
 
-                    {{-- Laporan --}}
-                    {{-- <a href="{{ route('report') }}"
+                    {{-- Karyawan --}}
+                    <a href="{{ route('karyawan.index') }}"
                         class="flex items-center px-4 py-3 rounded-sm
-                       {{ request()->routeIs('admin.report')
+                    {{ request()->routeIs('karyawan.*')
+                        ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
+                        : 'text-sidebar-text hover:text-sidebar-hover' }}">
+                        <i class="fas fa-user w-5"></i>
+                        <span class="ml-3">Karyawan</span>
+                    </a>
+
+                    {{-- Shift --}}
+                    <a href="{{ route('shift.index') }}"
+                        class="flex items-center px-4 py-3 rounded-sm
+                    {{ request()->routeIs('shift.*')
+                        ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
+                        : 'text-sidebar-text hover:text-sidebar-hover' }}">
+                        <i class="fas fa-clock w-5"></i>
+                        <span class="ml-3">Shift</span>
+                    </a>
+
+
+                    {{-- Laporan --}}
+                    <a href="{{ route('laporan.index') }}"
+                        class="flex items-center px-4 py-3 rounded-sm
+                       {{ request()->routeIs('laporan.index')
                            ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                            : 'text-sidebar-text hover:text-sidebar-hover' }}">
                         <i class="fas fa-chart-bar w-5"></i>
                         <span class="ml-3">Laporan</span>
-                    </a> --}}
+                    </a>
+
+                    <!-- Trigger Button -->
+                    <button type="button" onclick="openLogoutModal()"
+                        class="flex items-center mt-12 px-4 py-3 text-sidebar-text hover:text-sidebar-hover rounded-sm w-full text-left">
+                        <i class="fas fa-sign-out-alt w-5"></i>
+                        <span class="ml-3">Keluar</span>
+                    </button>
+
                 </nav>
 
             </div>
 
-            <div class="p-6 border-t border-gray-800">
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit"
-                        class="flex items-center px-4 py-3 text-sidebar-text hover:text-sidebar-hover rounded-sm w-full text-left">
-                        <i class="fas fa-sign-out-alt w-5"></i>
-                        <span class="ml-3">Keluar</span>
-                    </button>
-                </form>
-            </div>
+
+
         </aside>
 
         <!-- Main Content -->
         <main class="flex-1 p-6 overflow-y-auto">
             <div class="mx-auto">
                 {{ $slot }}
+
+                <!-- Logout Modal -->
+                <div id="logout-modal-overlay"
+                    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
+                    <div id="logout-modal-box"
+                        class="bg-white rounded-xl shadow-2xl p-6 w-80 relative opacity-0 scale-95 translate-y-4 transition-all duration-300">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800">Konfirmasi Logout</h3>
+                        <p class="mb-6 text-gray-600">Yakin ingin keluar dari akun ini?</p>
+                        <div class="flex justify-end space-x-3">
+                            <button type="button" onclick="closeLogoutModal()"
+                                class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">
+                                Batal
+                            </button>
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit"
+                                    class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
+                                    Keluar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    function openLogoutModal() {
+                        const overlay = document.getElementById('logout-modal-overlay');
+                        const modal = document.getElementById('logout-modal-box');
+
+                        overlay.classList.remove('hidden');
+                        setTimeout(() => {
+                            modal.classList.remove('opacity-0', 'scale-95', 'translate-y-4');
+                            modal.classList.add('opacity-100', 'scale-100', 'translate-y-0');
+                        }, 10);
+
+                        overlay.addEventListener('click', function(e) {
+                            if (e.target === overlay) {
+                                closeLogoutModal();
+                            }
+                        });
+                    }
+
+                    function closeLogoutModal() {
+                        const overlay = document.getElementById('logout-modal-overlay');
+                        const modal = document.getElementById('logout-modal-box');
+
+                        modal.classList.remove('opacity-100', 'scale-100', 'translate-y-0');
+                        modal.classList.add('opacity-0', 'scale-95', 'translate-y-4');
+
+                        setTimeout(() => {
+                            overlay.classList.add('hidden');
+                        }, 200);
+                    }
+                </script>
             </div>
         </main>
     </div>

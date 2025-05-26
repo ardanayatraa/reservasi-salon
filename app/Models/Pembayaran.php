@@ -18,6 +18,10 @@ class Pembayaran extends Model
         'notifikasi',
     ];
 
+        protected $casts = [
+                'tanggal_pembayaran' => 'date',
+                    ];
+
     public function pemesanan()
     {
         return $this->belongsTo(Pemesanan::class, 'id_pemesanan', 'id_pemesanan');

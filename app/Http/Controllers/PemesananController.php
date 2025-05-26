@@ -11,7 +11,7 @@ class PemesananController extends Controller
 {
     public function index()
     {
-        $pemesanan = Pemesanan::with(['pelanggan', 'perawatan'])->get();
+        $pemesanan = Pemesanan::with(['pelanggan'])->get();
         return view('pemesanan.index', compact('pemesanan'));
     }
 
@@ -19,13 +19,13 @@ class PemesananController extends Controller
     {
         $pelanggans = Pelanggan::all();
         $perawatans = Perawatan::all();
-        return view('pemesanan.create', compact('pelanggans', 'perawatans'));
+        return view('pemesanan.create', compact('pelanggans'));
     }
 
     public function store(Request $request)
     {
         $v = $request->validate([
-            'id_user'           => 'required|exists:users,id',
+
             'id_pelanggan'      => 'required|exists:pelanggans,id_pelanggan',
             'id_perawatan'      => 'required|exists:perawatans,id_perawatan',
             'tanggal_pemesanan' => 'required|date',
@@ -59,13 +59,13 @@ class PemesananController extends Controller
     {
         $pelanggans = Pelanggan::all();
         $perawatans = Perawatan::all();
-        return view('pemesanan.edit', compact('pemesanan', 'pelanggans', 'perawatans'));
+        return view('pemesanan.edit', compact('pemesanan', 'pelanggans'));
     }
 
     public function update(Request $request, Pemesanan $pemesanan)
     {
         $v = $request->validate([
-            'id_user'           => 'required|exists:users,id',
+
             'id_pelanggan'      => 'required|exists:pelanggans,id_pelanggan',
             'id_perawatan'      => 'required|exists:perawatans,id_perawatan',
             'tanggal_pemesanan' => 'required|date',

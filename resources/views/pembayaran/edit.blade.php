@@ -1,32 +1,23 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Edit Pembayaran</h2>
-    </x-slot>
+
+    <div class="px-4 py-6 sm:px-6 mb-4 lg:px-8 bg-white shadow sm:rounded-lg flex justify-between items-center">
+        <h2 class="font-semibold text-xl text-gray-800">
+            Edit Pembayaran
+        </h2>
+
+    </div>
 
     <div class="py-6">
-        <div class="max-w-3xl mx-auto bg-white shadow-sm rounded-lg p-6">
+        <div class="w-full mx-auto bg-white shadow-sm rounded-lg p-6">
             <form method="POST" action="{{ route('pembayaran.update', $pembayaran->id_pembayaran) }}">
                 @csrf
                 @method('PUT')
                 <div class="space-y-4">
-                    {{-- User --}}
-                    <div>
-                        <x-label for="id_user" value="User" />
-                        <select id="id_user" name="id_user"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
-                            @foreach (\App\Models\User::all() as $u)
-                                <option value="{{ $u->id }}" @selected($u->id == $pembayaran->id_user)>{{ $u->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <x-input-error for="id_user" class="mt-2" />
-                    </div>
-
                     {{-- Perawatan --}}
                     <div>
                         <x-label for="id_layanan" value="Perawatan" />
                         <select id="id_layanan" name="id_layanan"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                            class="mt-1 block w-full border-gray-300 rounded-md p-2 shadow-sm" required>
                             @foreach (\App\Models\Perawatan::all() as $pt)
                                 <option value="{{ $pt->id_perawatan }}" @selected($pt->id_perawatan == $pembayaran->id_layanan)>
                                     {{ $pt->nama_perawatan }}</option>
@@ -90,6 +81,10 @@
 
                 <div class="mt-6 flex justify-end">
                     <x-button>Update</x-button>
+                    <a href="{{ route('pembayaran.index') }}"
+                        class="ml-2 inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                        Batal
+                    </a>
                 </div>
             </form>
         </div>

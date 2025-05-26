@@ -12,7 +12,6 @@ class CreatePemesanansTable extends Migration
             $table->increments('id_pemesanan');
             $table->unsignedInteger('id_user');        // Admin yang entry
             $table->unsignedInteger('id_pelanggan');
-            $table->unsignedInteger('id_perawatan');
             $table->date('tanggal_pemesanan');
             $table->time('waktu');
             $table->integer('jumlah_perawatan');
@@ -23,7 +22,7 @@ class CreatePemesanansTable extends Migration
             $table->string('status_pembayaran');
             $table->string('token')->nullable();
             $table->timestamps();
-
+    $table->unsignedBigInteger('id_karyawan')->nullable();
             $table->foreign('id_user')
                   ->references('id_admin')->on('admins')
                   ->onDelete('cascade');

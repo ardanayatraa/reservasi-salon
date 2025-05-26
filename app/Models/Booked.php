@@ -15,6 +15,10 @@ class Booked extends Model
         'waktu',
     ];
 
+    protected $casts = [
+    'tanggal_booked' => 'date',
+];
+
     public function pemesanan()
     {
         return $this->belongsTo(Pemesanan::class, 'id_pemesanan', 'id_pemesanan');

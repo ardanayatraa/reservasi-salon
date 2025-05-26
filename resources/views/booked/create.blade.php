@@ -47,6 +47,10 @@
 
                 <div class="mt-6 flex justify-end">
                     <x-button>Simpan</x-button>
+                    <a href="{{ route('booked.index') }}"
+                        class="ml-2 inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                        Batal
+                    </a>
                 </div>
             </form>
         </div>
