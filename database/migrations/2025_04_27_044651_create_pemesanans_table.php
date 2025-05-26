@@ -30,8 +30,7 @@ class CreatePemesanansTable extends Migration
                   ->references('id_pelanggan')->on('pelanggans')
                   ->onDelete('cascade');
             $table->foreign('id_perawatan')
-                  ->references('id_perawatan')->on('perawatans')
-                  ->onDelete('cascade');
+                  ;
         });
     }
 
