@@ -504,13 +504,6 @@
                     </div>
                 @endforeach
             </div>
-
-            <div class="text-center mt-12">
-                <a href="#history"
-                    class="inline-block px-8 py-3 btn-primary rounded-sm font-light text-sm uppercase tracking-wider">
-                    Lihat Semua Layanan
-                </a>
-            </div>
         </div>
     </section>
 
