@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Function untuk cek ketersediaan real-time
 async function checkTimeSlotAvailability(date, time, totalDuration) {
   try {
-    const response = await fetch("/check-availability", {
+    const response = await fetch("api/check-availability", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
