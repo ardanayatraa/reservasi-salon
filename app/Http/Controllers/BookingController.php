@@ -18,67 +18,74 @@ use Illuminate\Support\Str;
 class BookingController extends Controller
 {
     /**
-     * Tampilkan landing page dengan daftar Perawatan.
-     */
-    public function index(Request $request)
-    {
-        // 1. Layanan / perawatan
-        $services = Perawatan::all();
+         * Tampilkan landing page dengan daftar Perawatan.
+         */
+        public function index(Request $request)
+        {
 
-        // 2. Ambil semua shift lengkap dengan karyawannya
-        $shifts = Shift::with('karyawans')->get();
+            // Ambil tanggal yang dipilih dari query string, default hari ini
+            $selectedDate = $request->query('date', now()->toDateString());
 
-       $timeSlots = [];
-        $now = now(); // waktu sekarang
+            // 1. Layanan / perawatan
+            $services = Perawatan::all();
 
-        foreach ($shifts as $shift) {
-            $slots = $this->generateTimeSlots($shift->start_time, $shift->end_time, 15);
+            // 2. Ambil semua shift lengkap dengan karyawannya
+            $shifts = Shift::with('karyawans')->get();
 
-            // Filter slot yang udah lewat kalau hari ini
-            $filteredSlots = collect($slots)->filter(function ($slot) use ($now) {
-                // Anggap $slot dalam format 'H:i'
-                $slotTime = \Carbon\Carbon::createFromFormat('H:i', $slot);
+            // 3. Generate dan filter time slots
+            $timeSlots = [];
+            $today     = now()->toDateString();
 
-                // Ganti tanggalnya jadi hari ini
-                $slotTime->setDate($now->year, $now->month, $now->day);
+            foreach ($shifts as $shift) {
+                $allSlots = $this->generateTimeSlots($shift->start_time, $shift->end_time, 15);
 
-                return $slotTime->greaterThanOrEqualTo($now);
-            })->values()->all();
+                $filtered = collect($allSlots)->filter(function ($slot) use ($today, $selectedDate) {
+                    // Jika tanggal yang dipilih bukan hari ini, tampilkan semua slot
+                    if ($selectedDate !== $today) {
+                        return true;
+                    }
+                    // Jika hari ini: buang slot yang sudah lewat
+                    $slotTime = Carbon::createFromFormat('H:i', $slot)
+                                    ->setDate(now()->year, now()->month, now()->day);
+                    return $slotTime->greaterThanOrEqualTo(now());
+                })->values()->all();
 
-            $timeSlots[$shift->nama_shift] = $filteredSlots;
-        }
-
-        // 4. User pelanggan (jika sudah login)
-        $user = Auth::guard('pelanggan')->user();
-
-        // 5. Riwayat berdasarkan query email
-        $email = $request->query('email');
-        $histories = null;
-
-        if ($email) {
-            $pel = Pelanggan::where('email', $email)->first();
-
-            if ($pel) {
-                $histories = Pemesanan::with(['bookeds.perawatan'])
-                    ->where('id_pelanggan', $pel->id_pelanggan)
-                    ->orderByDesc('tanggal_pemesanan')
-                    ->paginate(10)
-                    ->appends(['email' => $email]);
-            } else {
-                $histories = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
+                $timeSlots[$shift->nama_shift] = $filtered;
             }
+
+            // 4. User pelanggan (jika sudah login)
+            $user = Auth::guard('pelanggan')->user();
+
+            // 5. Riwayat berdasarkan query email
+            $email     = $request->query('email');
+            $histories = null;
+
+            if ($email) {
+                $pel = Pelanggan::where('email', $email)->first();
+
+                if ($pel) {
+                    $histories = Pemesanan::with(['bookeds.perawatan'])
+                        ->where('id_pelanggan', $pel->id_pelanggan)
+                        ->orderByDesc('tanggal_pemesanan')
+                        ->paginate(10)
+                        ->appends(['email' => $email, 'date' => $selectedDate]);
+                } else {
+                    $histories = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
+                }
+            }
+
+            // 6. Return view dengan compact termasuk selectedDate
+            return view('landing-page', compact(
+                'services',
+                'shifts',
+                'timeSlots',
+                'user',
+                'email',
+                'histories',
+                'selectedDate'
+            ));
         }
 
-        // 6. Return ke view
-        return view('landing-page', compact(
-            'services',
-            'shifts',
-            'timeSlots',
-            'user',
-            'email',
-            'histories'
-        ));
-    }
 
     /**
      * Generate time slots dengan interval tertentu

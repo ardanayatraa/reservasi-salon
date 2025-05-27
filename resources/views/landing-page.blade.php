@@ -1170,16 +1170,15 @@
 
                         {{-- Pilih Tanggal --}}
                         <div class="mb-6">
+                            {{-- Pilih Tanggal --}}
                             <label for="booking-date-picker" class="block text-sm font-medium text-gray-700 mb-2">
                                 <i class="fas fa-calendar-alt text-primary mr-2"></i>Pilih Tanggal
                             </label>
-                            <div class="date-picker">
-                                <input type="date" id="booking-date-picker"
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-primary"
-                                    value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}">
-                            </div>
-                            <p class="text-xs text-gray-500 mt-1">Pilih tanggal untuk melihat slot waktu yang tersedia
-                            </p>
+                            <input type="date" id="booking-date-picker"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-primary mb-6"
+                                value="{{ $selectedDate }}" min="{{ now()->toDateString() }}">
+
+
                         </div>
 
                         <!-- Employee availability info -->
