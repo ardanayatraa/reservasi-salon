@@ -39,32 +39,48 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Function untuk cek ketersediaan real-time
-  async function checkTimeSlotAvailability(date, time, totalDuration) {
-    try {
-      const response = await fetch("/check-availability", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-        },
-        body: JSON.stringify({
-          date: date,
-          start_time: time,
-          duration: totalDuration,
-        }),
-      })
+async function checkTimeSlotAvailability(date, time, totalDuration) {
+  try {
+    const response = await fetch("/check-availability", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+      },
+      body: JSON.stringify({
+        date: date,
+        start_time: time,
+        duration: totalDuration,
+      }),
+    });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const data = await response.json()
-      return data
-    } catch (error) {
-      console.error("Error checking availability:", error)
-      return { available: false, employees: [], slots_available: 0 }
+    // Cek status HTTP
+    if (!response.ok) {
+      const rawText = await response.text();
+      console.error("⚠️ HTTP response not OK:", response.status, response.statusText);
+      console.error("⚠️ Raw response:", rawText);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    // Cek apakah konten benar-benar JSON
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const rawText = await response.text();
+      console.error("❌ Expected JSON, but got:", contentType);
+      console.error("📄 Raw HTML/text response:", rawText);
+      throw new Error("Response is not JSON.");
+    }
+
+    // Kalau aman, parse JSON
+    const data = await response.json();
+    console.log("✅ Availability check success:", data);
+    return data;
+  } catch (error) {
+    console.error("💥 Error checking availability:", error);
+    return { available: false, employees: [], slots_available: 0, error: error.message };
   }
+}
+
 
   // Function to set active step
   function setActiveStep(stepNumber) {
