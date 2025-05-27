@@ -46,7 +46,7 @@
 </head>
 
 <body class="min-h-screen flex items-center justify-center p-4">
-    <div class="w-full w-full">
+    <div class="wl">
         <div class="text-center mb-8">
             <h1 class="text-4xl font-serif font-bold text-[#C9A57F]">DEWI</h1>
             <p class="text-sm text-gray-500">Beauty Salon</p>
@@ -183,14 +183,7 @@
                     </div>
                 </div>
 
-                <div class="flex items-center">
-                    <input id="terms" name="terms" type="checkbox" required
-                        class="h-4 w-4 text-[#C9A57F] focus:ring-[#C9A57F] border-gray-300 rounded">
-                    <label for="terms" class="ml-2 block text-sm text-gray-700">
-                        Saya menyetujui <a href="#" class="text-[#C9A57F] hover:underline">syarat dan
-                            ketentuan</a> yang berlaku
-                    </label>
-                </div>
+
 
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <button type="submit"

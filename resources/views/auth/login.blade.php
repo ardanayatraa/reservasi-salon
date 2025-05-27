@@ -106,19 +106,15 @@
                 </div>
 
                 <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <input id="remember_me" name="remember" type="checkbox"
-                            class="h-4 w-4 text-[#C9A57F] focus:ring-[#C9A57F] border-gray-300 rounded">
-                        <label for="remember_me" class="ml-2 block text-sm text-gray-700">
-                            Ingat saya
-                        </label>
+                    <div class="text-center mt-4">
+                        <p class="text-sm text-gray-600">
+                            Belum punya akun?
+                            <a href="{{ route('register') }}" class="text-[#C9A57F] hover:underline">
+                                Daftar sekarang
+                            </a>
+                        </p>
                     </div>
 
-                    @if (Route::has('password.request'))
-                        <a href="{{ route('password.request') }}" class="text-sm text-[#C9A57F] hover:underline">
-                            Lupa password?
-                        </a>
-                    @endif
                 </div>
 
                 <div>
