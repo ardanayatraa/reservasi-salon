@@ -38,10 +38,10 @@ document.addEventListener("DOMContentLoaded", () => {
     totalDuration: 0,
   }
 
-  // Function untuk cek ketersediaan real-time
+// Function untuk cek ketersediaan real-time
 async function checkTimeSlotAvailability(date, time, totalDuration) {
   try {
-    const response = await fetch("api/check-availability", {
+    const response = await fetch("{{ url('/check-availability') }}", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -77,7 +77,12 @@ async function checkTimeSlotAvailability(date, time, totalDuration) {
     return data;
   } catch (error) {
     console.error("💥 Error checking availability:", error);
-    return { available: false, employees: [], slots_available: 0, error: error.message };
+    return {
+      available: false,
+      employees: [],
+      slots_available: 0,
+      error: error.message,
+    };
   }
 }
 
