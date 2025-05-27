@@ -1185,22 +1185,6 @@
                         <div id="employee-info" class="mb-4"></div>
 
                         {{-- Pilih Shift & Slot --}}
-                        <input type="hidden" id="selected-date" value="{{ $selectedDate }}">
-                        <input type="hidden" id="now-time" value="{{ now()->format('H:i') }}">
-                        <input type="hidden" id="today-date" value="{{ now()->toDateString() }}">
-
-                        <style>
-                            .time-slot.disabled {
-                                background-color: #e5e7eb;
-                                /* gray-200 */
-                                color: #9ca3af;
-                                /* gray-400 */
-                                cursor: not-allowed;
-                                pointer-events: none;
-                                opacity: 0.6;
-                            }
-                        </style>
-
                         <div id="time-slots-container">
                             @foreach ($shifts as $shift)
                                 <div class="mb-6 shift-block" data-shift-id="{{ $shift->id_shift }}"
@@ -1227,24 +1211,6 @@
                                 </div>
                             @endforeach
                         </div>
-
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                const selectedDate = document.getElementById('selected-date')?.value;
-                                const nowTime = document.getElementById('now-time')?.value;
-                                const todayDate = document.getElementById('today-date')?.value;
-
-                                if (selectedDate === todayDate) {
-                                    document.querySelectorAll('.time-slot').forEach(slot => {
-                                        const time = slot.dataset.time;
-                                        if (time < nowTime) {
-                                            slot.classList.add('disabled');
-                                        }
-                                    });
-                                }
-                            });
-                        </script>
-
 
                         <div class="flex justify-end">
                             <button type="button" id="next-to-step-2"
