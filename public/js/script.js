@@ -39,39 +39,32 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Function untuk cek ketersediaan real-time
-    async function checkTimeSlotAvailability(date, time, totalDuration) {
+  async function checkTimeSlotAvailability(date, time, totalDuration) {
     try {
-        const params = new URLSearchParams({
-        date: date,
-        start_time: time,
-        duration: totalDuration,
-        })
-
-
-        console.log("🔍 Checking availability with params:", params.toString())
-        const response = await fetch(`/check-availability?${params.toString()}`, {
-        method: "GET",
+      const response = await fetch("/check-availability", {
+        method: "POST",
         headers: {
-            "X-Requested-With": "XMLHttpRequest",
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
         },
-        })
+        body: JSON.stringify({
+          date: date,
+          start_time: time,
+          duration: totalDuration,
+        }),
+      })
 
-        if (!response.ok) {
-        const rawText = await response.text()
-        console.error("❌ HTTP error:", response.status)
-        console.error("📄 Response body:", rawText)
-        throw new Error("Gagal mengambil data availability")
-        }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
 
-        const data = await response.json()
-        console.log("✅ Availability data:", data)
-        return data
+      const data = await response.json()
+      return data
     } catch (error) {
-        console.error("💥 Error checking availability:", error)
-        return { available: false, employees: [], slots_available: 0, error: error.message }
+      console.error("Error checking availability:", error)
+      return { available: false, employees: [], slots_available: 0 }
     }
-    }
-
+  }
 
   // Function to set active step
   function setActiveStep(stepNumber) {

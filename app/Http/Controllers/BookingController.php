@@ -100,32 +100,36 @@ class BookingController extends Controller
     /**
      * Cek ketersediaan karyawan untuk waktu tertentu
      */
-        public function checkAvailability(Request $request)
-        {
-            $date = $request->query('date');
-            $startTime = $request->query('start_time');
-            $duration = (int) $request->query('duration');
+    public function checkAvailability(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'start_time' => 'required|date_format:H:i',
+            'duration' => 'required|integer|min:1', // dalam menit
+        ]);
 
-            if (!$date || !$startTime || !$duration) {
-                return response()->json([
-                    'available' => false,
-                    'employees' => [],
-                    'slots_available' => 0,
-                    'error' => 'Parameter tidak lengkap'
-                ], 400);
-            }
+        $date = $request->date;
+        $startTime = $request->start_time;
+        $duration = $request->duration;
 
-            $endTime = Carbon::parse($startTime)->addMinutes($duration)->format('H:i');
+        // Hitung waktu selesai
+        $endTime = Carbon::parse($startTime)->addMinutes($duration)->format('H:i');
 
-            $availableEmployees = $this->findAvailableEmployees($date, $startTime, $endTime);
+        // Cari shift yang mencakup waktu ini
+        $availableEmployees = $this->findAvailableEmployees($date, $startTime, $endTime);
 
-            return response()->json([
-                'available' => count($availableEmployees) > 0,
-                'employees' => $availableEmployees,
-                'slots_available' => count($availableEmployees),
-            ]);
-        }
-
+        return response()->json([
+            'available' => count($availableEmployees) > 0,
+            'employees' => $availableEmployees,
+            'slots_available' => count($availableEmployees),
+            'debug' => [
+                'date' => $date,
+                'start_time' => $startTime,
+                'end_time' => $endTime,
+                'duration' => $duration
+            ]
+        ]);
+    }
 
     /**
      * Cari karyawan yang tersedia untuk waktu tertentu

@@ -13,7 +13,7 @@ class CreatePerawatansTable extends Migration
             $table->string('nama_perawatan');
             $table->string('foto')->nullable();
             $table->text('deskripsi')->nullable();
-            $table->time('waktu');
+            $table->bigInteger('waktu');
             $table->decimal('harga', 15, 2);
             $table->timestamps();
         });
