@@ -93,7 +93,7 @@
                 <button id="sidebar-toggle" class="mr-4 text-dark focus:outline-none md:hidden">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
-                <a href="index.html" class="flex items-center">
+                <a href="/dashboard" class="flex items-center">
                     <span class="text-2xl font-serif font-bold text-primary">DEWI</span>
                     <span class="ml-2 text-sm font-light text-dark">ADMIN</span>
                 </a>

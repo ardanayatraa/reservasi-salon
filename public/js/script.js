@@ -5,7 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (menuToggle && mobileMenu) {
     // Toggle mobile menu with icon change
-    menuToggle.addEventListener("click", () => {
+    menuToggle.addEventListener("click", (e) => {
+      e.preventDefault()
+      e.stopPropagation()
       mobileMenu.classList.toggle("hidden")
 
       // Change hamburger icon to X when open
@@ -13,9 +15,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!mobileMenu.classList.contains("hidden")) {
         icon.classList.remove('fa-bars')
         icon.classList.add('fa-times')
+        // Prevent body scroll when menu is open
+        document.body.style.overflow = 'hidden'
       } else {
         icon.classList.remove('fa-times')
         icon.classList.add('fa-bars')
+        // Restore body scroll when menu is closed
+        document.body.style.overflow = 'auto'
       }
     })
 
@@ -30,6 +36,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const icon = menuToggle.querySelector('i')
         icon.classList.remove('fa-times')
         icon.classList.add('fa-bars')
+        // Restore body scroll
+        document.body.style.overflow = 'auto'
 
         // Smooth scroll to target
         const targetId = this.getAttribute('href')
@@ -53,6 +61,8 @@ document.addEventListener("DOMContentLoaded", () => {
           const icon = menuToggle.querySelector('i')
           icon.classList.remove('fa-times')
           icon.classList.add('fa-bars')
+          // Restore body scroll
+          document.body.style.overflow = 'auto'
         }
       }
     })
@@ -64,6 +74,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const icon = menuToggle.querySelector('i')
         icon.classList.remove('fa-times')
         icon.classList.add('fa-bars')
+        // Restore body scroll
+        document.body.style.overflow = 'auto'
       }
     })
   }
@@ -126,63 +138,76 @@ document.addEventListener("DOMContentLoaded", () => {
   const stepContents = document.querySelectorAll(".step-content")
   const bookingForm = document.getElementById("booking-form")
   const selectedServicesContainer = document.getElementById("selected-services-container")
+  const datePicker = document.getElementById("booking-date-picker")
 
-  // Make modal responsive
+  // Make modal responsive and prevent horizontal scroll
   function makeModalResponsive() {
     if (modal) {
       const modalContent = modal.querySelector('.modal-content')
       if (modalContent) {
+        // Always ensure modal doesn't exceed viewport
+        modalContent.style.maxWidth = '100%'
+        modalContent.style.boxSizing = 'border-box'
+
         if (window.innerWidth < 768) {
-          // Mobile styles
-          modalContent.style.margin = '1rem'
-          modalContent.style.maxWidth = 'calc(100vw - 2rem)'
-          modalContent.style.width = 'calc(100vw - 2rem)'
-          modalContent.style.maxHeight = 'calc(100vh - 2rem)'
+          // Mobile specific adjustments
+          modalContent.style.margin = '0.5rem'
+          modalContent.style.width = 'calc(100vw - 1rem)'
+          modalContent.style.maxHeight = 'calc(100vh - 1rem)'
           modalContent.style.overflow = 'auto'
 
           // Adjust stepper for mobile
           const stepper = modalContent.querySelector('.stepper')
           if (stepper) {
             stepper.style.marginBottom = '1rem'
+            stepper.style.padding = '0 0.5rem'
           }
 
           // Adjust step labels for mobile
-          const stepLabels = modalContent.querySelector('.flex.justify-between.text-sm')
+          const stepLabels = modalContent.querySelector('.flex.justify-between.text-sm, .flex.justify-between.text-xs')
           if (stepLabels) {
             stepLabels.style.fontSize = '0.75rem'
             stepLabels.style.marginBottom = '1rem'
+            stepLabels.style.padding = '0 0.5rem'
           }
 
-          // Adjust padding for mobile
-          const modalPadding = modalContent.querySelector('.p-6')
-          if (modalPadding) {
-            modalPadding.classList.remove('p-6')
-            modalPadding.classList.add('p-4')
-          }
-
-          // Make time slots grid responsive
-          const timeSlotGrids = modalContent.querySelectorAll('.grid.grid-cols-5')
+          // Make time slots grid more mobile friendly
+          const timeSlotGrids = modalContent.querySelectorAll('.grid')
           timeSlotGrids.forEach(grid => {
-            grid.classList.remove('grid-cols-5')
-            grid.classList.add('grid-cols-3')
+            if (grid.classList.contains('grid-cols-5')) {
+              grid.classList.remove('grid-cols-5')
+              grid.classList.add('grid-cols-3')
+            }
           })
 
           // Adjust service selection for mobile
           const serviceRows = modalContent.querySelectorAll('.service-row')
           serviceRows.forEach(row => {
-            row.classList.remove('flex', 'items-center', 'space-x-2')
-            row.classList.add('flex', 'flex-col', 'space-y-2')
+            // Ensure proper mobile layout
+            row.classList.remove('md:flex-row', 'md:items-center', 'md:space-y-0', 'md:space-x-2')
+            row.classList.add('flex-col', 'space-y-2')
 
             const select = row.querySelector('select')
             const button = row.querySelector('button')
-            if (select) select.style.width = '100%'
-            if (button) button.style.width = '100%'
+            if (select) {
+              select.style.width = '100%'
+              select.style.fontSize = '14px'
+            }
+            if (button) {
+              button.style.width = '100%'
+              button.style.fontSize = '14px'
+            }
+          })
+
+          // Adjust form elements for mobile
+          const formElements = modalContent.querySelectorAll('input, select, textarea, button')
+          formElements.forEach(element => {
+            element.style.fontSize = Math.max(16, parseInt(getComputedStyle(element).fontSize)) + 'px'
           })
 
         } else {
           // Desktop styles (reset)
           modalContent.style.margin = '2rem auto'
-          modalContent.style.maxWidth = '800px'
           modalContent.style.width = ''
           modalContent.style.maxHeight = ''
           modalContent.style.overflow = ''
@@ -191,39 +216,48 @@ document.addEventListener("DOMContentLoaded", () => {
           const stepper = modalContent.querySelector('.stepper')
           if (stepper) {
             stepper.style.marginBottom = '2rem'
+            stepper.style.padding = '0 1rem'
           }
 
           // Reset step labels
-          const stepLabels = modalContent.querySelector('.flex.justify-between.text-sm')
+          const stepLabels = modalContent.querySelector('.flex.justify-between.text-sm, .flex.justify-between.text-xs')
           if (stepLabels) {
             stepLabels.style.fontSize = ''
             stepLabels.style.marginBottom = '2rem'
-          }
-
-          // Reset padding
-          const modalPadding = modalContent.querySelector('.p-4')
-          if (modalPadding) {
-            modalPadding.classList.remove('p-4')
-            modalPadding.classList.add('p-6')
+            stepLabels.style.padding = '0 1rem'
           }
 
           // Reset time slots grid
-          const timeSlotGrids = modalContent.querySelectorAll('.grid.grid-cols-3')
+          const timeSlotGrids = modalContent.querySelectorAll('.grid')
           timeSlotGrids.forEach(grid => {
-            grid.classList.remove('grid-cols-3')
-            grid.classList.add('grid-cols-5')
+            if (grid.classList.contains('grid-cols-3')) {
+              grid.classList.remove('grid-cols-3')
+              grid.classList.add('grid-cols-5')
+            }
           })
 
           // Reset service selection
           const serviceRows = modalContent.querySelectorAll('.service-row')
           serviceRows.forEach(row => {
-            row.classList.remove('flex', 'flex-col', 'space-y-2')
-            row.classList.add('flex', 'items-center', 'space-x-2')
+            row.classList.add('md:flex-row', 'md:items-center', 'md:space-y-0', 'md:space-x-2')
+            row.classList.remove('flex-col', 'space-y-2')
 
             const select = row.querySelector('select')
             const button = row.querySelector('button')
-            if (select) select.style.width = ''
-            if (button) button.style.width = ''
+            if (select) {
+              select.style.width = ''
+              select.style.fontSize = ''
+            }
+            if (button) {
+              button.style.width = ''
+              button.style.fontSize = ''
+            }
+          })
+
+          // Reset form elements
+          const formElements = modalContent.querySelectorAll('input, select, textarea, button')
+          formElements.forEach(element => {
+            element.style.fontSize = ''
           })
         }
       }
@@ -290,6 +324,92 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Function to check if time slot is in the past
+  function isTimeSlotInPast(date, time) {
+    const now = new Date()
+    const slotDateTime = new Date(`${date}T${time}:00`)
+    return slotDateTime < now
+  }
+
+  // Function to update time slots based on selected date
+  function updateTimeSlotsForDate(selectedDate) {
+    const now = new Date()
+    const isToday = selectedDate === now.toISOString().split('T')[0]
+
+    document.querySelectorAll('.shift-block').forEach(shiftBlock => {
+      const shiftStart = shiftBlock.dataset.start
+      const shiftEnd = shiftBlock.dataset.end
+
+      shiftBlock.querySelectorAll('.time-slot').forEach(slot => {
+        const slotTime = slot.dataset.time
+
+        // Reset classes
+        slot.classList.remove('disabled', 'unavailable', 'selected', 'checking')
+        slot.style.pointerEvents = 'auto'
+        slot.innerHTML = slotTime
+
+        // Check if slot is in the past
+        if (isTimeSlotInPast(selectedDate, slotTime)) {
+          slot.classList.add('disabled')
+          slot.style.pointerEvents = 'none'
+          slot.title = 'Waktu sudah berlalu'
+        }
+
+        // Check if slot fits within total duration
+        const startTime = parseHM(slotTime)
+        const endTime = parseHM(shiftEnd)
+
+        if (startTime + bookingData.totalDuration > endTime) {
+          slot.style.display = 'none'
+        } else {
+          slot.style.display = 'block'
+        }
+      })
+    })
+
+    // Clear employee info when date changes
+    const employeeInfo = document.getElementById("employee-info")
+    if (employeeInfo) {
+      employeeInfo.innerHTML = ""
+    }
+
+    // Reset selected time
+    bookingData.time = null
+    const selectedTimeInput = document.getElementById("selected-time")
+    if (selectedTimeInput) {
+      selectedTimeInput.value = ""
+    }
+
+    // Update end time display
+    const endElement = document.getElementById("displayEnd")
+    if (endElement) {
+      endElement.textContent = "–"
+    }
+
+    // Disable next button
+    const nextButton = document.getElementById("next-to-step-2")
+    if (nextButton) {
+      nextButton.disabled = true
+    }
+  }
+
+  // Date picker event listener
+  if (datePicker) {
+    datePicker.addEventListener('change', function() {
+      const selectedDate = this.value
+      bookingData.date = selectedDate
+
+      // Update hidden input
+      const bookingDateInput = document.getElementById("booking-date")
+      if (bookingDateInput) {
+        bookingDateInput.value = selectedDate
+      }
+
+      // Update time slots for the new date
+      updateTimeSlotsForDate(selectedDate)
+    })
+  }
+
   // Function to set active step
   function setActiveStep(stepNumber) {
     steps.forEach((step) => step.classList.remove("active", "completed"))
@@ -321,7 +441,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Event listeners for booking buttons
   if (bookButtons.length > 0) {
     bookButtons.forEach((button) => {
-      button.addEventListener("click", function () {
+      button.addEventListener("click", function (e) {
+        e.preventDefault()
         const serviceId = this.dataset.service
         const serviceName = this.dataset.name
         const price = Number.parseInt(this.dataset.price)
@@ -361,19 +482,22 @@ document.addEventListener("DOMContentLoaded", () => {
     bookingData.services.forEach((service, index) => {
       const serviceElement = document.createElement("div")
       serviceElement.className = "selected-service"
+
+      // Create responsive layout
+      const isMobile = window.innerWidth < 768
       serviceElement.innerHTML = `
-                <div class="flex justify-between items-center ${window.innerWidth < 768 ? 'flex-col space-y-2' : ''}">
-                    <div class="${window.innerWidth < 768 ? 'text-center' : ''}">
-                        <span class="font-medium">${service.name}</span>
-                        <span class="text-sm text-gray-500 ml-2">(${service.duration} menit)</span>
-                    </div>
-                    <div class="flex items-center ${window.innerWidth < 768 ? 'justify-center space-x-4' : ''}">
-                        <span class="text-primary mr-4">Rp ${Number.parseInt(service.price).toLocaleString("id-ID")}</span>
-                        <button type="button" class="remove-selected-service text-red-500 text-xl leading-none hover:bg-red-100 rounded-full w-6 h-6 flex items-center justify-center"
-                            data-index="${index}" title="Hapus">&times;</button>
-                    </div>
-                </div>
-            `
+        <div class="flex ${isMobile ? 'flex-col space-y-2' : 'justify-between items-center'}">
+          <div class="${isMobile ? 'text-center' : ''}">
+            <span class="font-medium text-sm md:text-base">${service.name}</span>
+            <span class="text-xs md:text-sm text-gray-500 ${isMobile ? 'block' : 'ml-2'}">(${service.duration} menit)</span>
+          </div>
+          <div class="flex items-center ${isMobile ? 'justify-center space-x-4' : ''}">
+            <span class="text-primary mr-4 text-sm md:text-base">Rp ${Number.parseInt(service.price).toLocaleString("id-ID")}</span>
+            <button type="button" class="remove-selected-service text-red-500 text-xl leading-none hover:bg-red-100 rounded-full w-6 h-6 flex items-center justify-center"
+              data-index="${index}" title="Hapus">&times;</button>
+          </div>
+        </div>
+      `
       selectedServicesContainer.appendChild(serviceElement)
     })
 
@@ -403,7 +527,10 @@ document.addEventListener("DOMContentLoaded", () => {
       return total + Number.parseInt(service.duration)
     }, 0)
 
-    document.getElementById("displayDurasi").textContent = bookingData.totalDuration
+    const durasiElement = document.getElementById("displayDurasi")
+    if (durasiElement) {
+      durasiElement.textContent = bookingData.totalDuration
+    }
   }
 
   // Function to open modal
@@ -417,6 +544,14 @@ document.addEventListener("DOMContentLoaded", () => {
       modal.style.display = "block"
       document.body.style.overflow = "hidden" // Prevent scrolling
       makeModalResponsive() // Apply responsive styles
+
+      // Set date picker to today and update time slots
+      if (datePicker) {
+        const today = new Date().toISOString().split('T')[0]
+        datePicker.value = today
+        bookingData.date = today
+        updateTimeSlotsForDate(today)
+      }
     }
   }
 
@@ -460,31 +595,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Refresh slots based on total duration
   function refreshSlots() {
-    // Enable next button if at least one service is selected
-    document.getElementById("next-to-step-2").disabled = bookingData.services.length === 0
+    const nextButton = document.getElementById("next-to-step-2")
+    if (nextButton) {
+      nextButton.disabled = bookingData.services.length === 0 || !bookingData.time
+    }
 
     // Update end time if a time slot is selected
     if (bookingData.time) {
       const startTime = parseHM(bookingData.time)
       const endTime = startTime + bookingData.totalDuration
-      document.getElementById("displayEnd").textContent = formatHM(endTime)
+      const endElement = document.getElementById("displayEnd")
+      if (endElement) {
+        endElement.textContent = formatHM(endTime)
+      }
     }
 
-    // Show/hide time slots based on duration
-    document.querySelectorAll(".shift-block").forEach((block) => {
-      const shiftEnd = parseHM(block.dataset.end)
-      block.querySelectorAll(".time-slot").forEach((slot) => {
-        const start = parseHM(slot.dataset.time)
-        slot.style.display = start + bookingData.totalDuration <= shiftEnd ? "block" : "none"
-      })
-    })
+    // Update time slots for current date
+    updateTimeSlotsForDate(bookingData.date)
   }
 
   // Add service to selected services
   document.querySelectorAll(".add-to-selected").forEach((button) => {
     button.addEventListener("click", function () {
       const select = this.previousElementSibling
-      if (select.value) {
+      if (select && select.value) {
         const option = select.selectedOptions[0]
         const serviceId = select.value
         const serviceName = option.dataset.name
@@ -516,58 +650,66 @@ document.addEventListener("DOMContentLoaded", () => {
   })
 
   // Add new service row
-  document.getElementById("add-service-row").addEventListener("click", () => {
-    const container = document.getElementById("services-container")
-    const row = container.querySelector(".service-row").cloneNode(true)
+  const addServiceRowBtn = document.getElementById("add-service-row")
+  if (addServiceRowBtn) {
+    addServiceRowBtn.addEventListener("click", () => {
+      const container = document.getElementById("services-container")
+      const row = container.querySelector(".service-row").cloneNode(true)
 
-    // Reset select
-    row.querySelector("select").value = ""
+      // Reset select
+      row.querySelector("select").value = ""
 
-    // Add event listener to add button
-    row.querySelector(".add-to-selected").addEventListener("click", function () {
-      const select = this.previousElementSibling
-      if (select.value) {
-        const option = select.selectedOptions[0]
-        const serviceId = select.value
-        const serviceName = option.dataset.name
-        const price = Number.parseInt(option.dataset.price)
-        const duration = Number.parseInt(option.dataset.duration)
+      // Add event listener to add button
+      row.querySelector(".add-to-selected").addEventListener("click", function () {
+        const select = this.previousElementSibling
+        if (select && select.value) {
+          const option = select.selectedOptions[0]
+          const serviceId = select.value
+          const serviceName = option.dataset.name
+          const price = Number.parseInt(option.dataset.price)
+          const duration = Number.parseInt(option.dataset.duration)
 
-        // Check if service already selected
-        const alreadySelected = bookingData.services.some((service) => service.id === serviceId)
-        if (alreadySelected) {
-          alert("Layanan ini sudah dipilih!")
-          return
+          // Check if service already selected
+          const alreadySelected = bookingData.services.some((service) => service.id === serviceId)
+          if (alreadySelected) {
+            alert("Layanan ini sudah dipilih!")
+            return
+          }
+
+          // Add to services array
+          bookingData.services.push({
+            id: serviceId,
+            name: serviceName,
+            price: price,
+            duration: duration,
+          })
+
+          // Reset select
+          select.value = ""
+
+          // Update display
+          updateSelectedServicesDisplay()
         }
+      })
 
-        // Add to services array
-        bookingData.services.push({
-          id: serviceId,
-          name: serviceName,
-          price: price,
-          duration: duration,
-        })
-
-        // Reset select
-        select.value = ""
-
-        // Update display
-        updateSelectedServicesDisplay()
-      }
+      container.appendChild(row)
+      makeModalResponsive() // Reapply responsive styles
     })
-
-    container.appendChild(row)
-    makeModalResponsive() // Reapply responsive styles
-  })
+  }
 
   // Time slot selection dengan availability checking dan fallback
   window.selectSlot = async (shiftId, time) => {
+    // Check if slot is disabled (past time)
+    const selectedSlot = document.querySelector(`.time-slot[data-time="${time}"]`)
+    if (!selectedSlot || selectedSlot.classList.contains('disabled')) {
+      return
+    }
+
     // Clear previous selections
     document
       .querySelectorAll(".time-slot")
       .forEach((slot) => slot.classList.remove("selected", "unavailable", "checking"))
 
-    const selectedSlot = document.querySelector(`.time-slot[data-time="${time}"]`)
     if (!selectedSlot) return
 
     // Cek apakah ada layanan yang dipilih
@@ -596,12 +738,18 @@ document.addEventListener("DOMContentLoaded", () => {
         bookingData.time = time
 
         // Set hidden input value
-        document.getElementById("selected-time").value = time
+        const selectedTimeInput = document.getElementById("selected-time")
+        if (selectedTimeInput) {
+          selectedTimeInput.value = time
+        }
 
         // Calculate end time
         const startTime = parseHM(time)
         const endTime = startTime + bookingData.totalDuration
-        document.getElementById("displayEnd").textContent = formatHM(endTime)
+        const endElement = document.getElementById("displayEnd")
+        if (endElement) {
+          endElement.textContent = formatHM(endTime)
+        }
 
         // Show available employees info
         if (availability.employees && availability.employees.length > 0) {
@@ -609,20 +757,23 @@ document.addEventListener("DOMContentLoaded", () => {
           if (employeeInfo) {
             const warningMessage = availability.message ? `<div class="text-xs text-yellow-600 mt-1">${availability.message}</div>` : ''
             employeeInfo.innerHTML = `
-                        <div class="text-sm text-green-600 mt-2 p-3 bg-green-50 rounded-md">
-                            <i class="fas fa-check-circle"></i>
-                            ${availability.slots_available} karyawan tersedia untuk waktu ini
-                            <div class="text-xs mt-1">
-                                Karyawan: ${availability.employees.map((emp) => emp.name).join(", ")}
-                            </div>
-                            ${warningMessage}
-                        </div>
-                    `
+              <div class="text-sm text-green-600 mt-2 p-3 bg-green-50 rounded-md">
+                <i class="fas fa-check-circle"></i>
+                ${availability.slots_available} karyawan tersedia untuk waktu ini
+                <div class="text-xs mt-1">
+                  Karyawan: ${availability.employees.map((emp) => emp.name).join(", ")}
+                </div>
+                ${warningMessage}
+              </div>
+            `
           }
         }
 
         // Enable next button
-        document.getElementById("next-to-step-2").disabled = false
+        const nextButton = document.getElementById("next-to-step-2")
+        if (nextButton) {
+          nextButton.disabled = false
+        }
       } else {
         // Slot tidak tersedia
         selectedSlot.classList.add("unavailable")
@@ -631,11 +782,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const employeeInfo = document.getElementById("employee-info")
         if (employeeInfo) {
           employeeInfo.innerHTML = `
-                    <div class="text-sm text-red-600 mt-2 p-3 bg-red-50 rounded-md">
-                        <i class="fas fa-times-circle"></i>
-                        Tidak ada karyawan yang tersedia untuk waktu ini. Silakan pilih waktu lain.
-                    </div>
-                `
+            <div class="text-sm text-red-600 mt-2 p-3 bg-red-50 rounded-md">
+              <i class="fas fa-times-circle"></i>
+              Tidak ada karyawan yang tersedia untuk waktu ini. Silakan pilih waktu lain.
+            </div>
+          `
         }
 
         alert("Maaf, tidak ada karyawan yang tersedia untuk waktu tersebut. Silakan pilih waktu lain.")
@@ -651,23 +802,33 @@ document.addEventListener("DOMContentLoaded", () => {
       // Fallback: allow selection anyway
       selectedSlot.classList.add("selected")
       bookingData.time = time
-      document.getElementById("selected-time").value = time
+
+      const selectedTimeInput = document.getElementById("selected-time")
+      if (selectedTimeInput) {
+        selectedTimeInput.value = time
+      }
 
       const startTime = parseHM(time)
       const endTime = startTime + bookingData.totalDuration
-      document.getElementById("displayEnd").textContent = formatHM(endTime)
+      const endElement = document.getElementById("displayEnd")
+      if (endElement) {
+        endElement.textContent = formatHM(endTime)
+      }
 
       const employeeInfo = document.getElementById("employee-info")
       if (employeeInfo) {
         employeeInfo.innerHTML = `
           <div class="text-sm text-yellow-600 mt-2 p-3 bg-yellow-50 rounded-md">
-              <i class="fas fa-exclamation-triangle"></i>
-              Tidak dapat mengecek ketersediaan karyawan. Slot dipilih dengan asumsi tersedia.
+            <i class="fas fa-exclamation-triangle"></i>
+            Tidak dapat mengecek ketersediaan karyawan. Slot dipilih dengan asumsi tersedia.
           </div>
         `
       }
 
-      document.getElementById("next-to-step-2").disabled = false
+      const nextButton = document.getElementById("next-to-step-2")
+      if (nextButton) {
+        nextButton.disabled = false
+      }
     }
   }
 
@@ -689,21 +850,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Update summary in Step 2
       const summaryServicesList = document.getElementById("summary-services-list")
-      summaryServicesList.innerHTML = ""
+      if (summaryServicesList) {
+        summaryServicesList.innerHTML = ""
 
-      bookingData.services.forEach((service) => {
-        const serviceItem = document.createElement("div")
-        serviceItem.className = "flex justify-between mb-2"
-        serviceItem.innerHTML = `
-                    <span class="text-gray-600">${service.name}:</span>
-                    <span class="font-medium">Rp ${Number.parseInt(service.price).toLocaleString("id-ID")}</span>
-                `
-        summaryServicesList.appendChild(serviceItem)
-      })
+        bookingData.services.forEach((service) => {
+          const serviceItem = document.createElement("div")
+          serviceItem.className = "flex justify-between mb-2 text-sm"
+          serviceItem.innerHTML = `
+            <span class="text-gray-600">${service.name}:</span>
+            <span class="font-medium">Rp ${Number.parseInt(service.price).toLocaleString("id-ID")}</span>
+          `
+          summaryServicesList.appendChild(serviceItem)
+        })
+      }
 
-      document.getElementById("summary-date").textContent = formatDate(bookingData.date)
-      document.getElementById("summary-time").textContent = bookingData.time
-      document.getElementById("summary-price").textContent = formatPrice(bookingData.totalPrice)
+      const summaryDate = document.getElementById("summary-date")
+      if (summaryDate) {
+        summaryDate.textContent = formatDate(bookingData.date)
+      }
+
+      const summaryTime = document.getElementById("summary-time")
+      if (summaryTime) {
+        summaryTime.textContent = bookingData.time
+      }
+
+      const summaryPrice = document.getElementById("summary-price")
+      if (summaryPrice) {
+        summaryPrice.textContent = formatPrice(bookingData.totalPrice)
+      }
 
       goToStep(2)
     })
@@ -814,14 +988,22 @@ document.addEventListener("DOMContentLoaded", () => {
       totalDuration: 0,
     }
 
+    // Reset date picker
+    if (datePicker) {
+      datePicker.value = new Date().toISOString().split('T')[0]
+    }
+
     // Reset time slots
     document.querySelectorAll(".time-slot").forEach((slot) => {
-      slot.classList.remove("selected", "unavailable", "checking")
+      slot.classList.remove("selected", "unavailable", "checking", "disabled")
       slot.innerHTML = slot.dataset.time
+      slot.style.pointerEvents = "auto"
     })
 
     // Reset selected services container
-    selectedServicesContainer.innerHTML = ""
+    if (selectedServicesContainer) {
+      selectedServicesContainer.innerHTML = ""
+    }
 
     // Reset service selects
     document.querySelectorAll(".service-select").forEach((select) => {
@@ -837,8 +1019,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Reset display values
-    document.getElementById("displayDurasi").textContent = "0"
-    document.getElementById("displayEnd").textContent = "–"
+    const durasiElement = document.getElementById("displayDurasi")
+    if (durasiElement) {
+      durasiElement.textContent = "0"
+    }
+
+    const endElement = document.getElementById("displayEnd")
+    if (endElement) {
+      endElement.textContent = "–"
+    }
 
     // Clear employee info
     const employeeInfo = document.getElementById("employee-info")
@@ -847,7 +1036,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Disable next button
-    document.getElementById("next-to-step-2").disabled = true
+    const nextButton = document.getElementById("next-to-step-2")
+    if (nextButton) {
+      nextButton.disabled = true
+    }
   }
 
   function formatPrice(price) {
@@ -883,16 +1075,30 @@ document.addEventListener("DOMContentLoaded", () => {
         goToStep(3)
 
         // Set reservation details
-        document.getElementById("reservation-id").textContent = savedBookingData.orderId || orderId
-        document.getElementById("reservation-name").textContent =
-          savedBookingData.customerName || window.userData?.nama_lengkap || "-"
-        document.getElementById("reservation-service").textContent = savedBookingData.serviceName || "-"
-        document.getElementById("reservation-datetime").textContent =
-          (savedBookingData.bookingDate ? savedBookingData.bookingDate + ", " : "") +
-          (savedBookingData.bookingTime || "-")
-        document.getElementById("reservation-price").textContent = savedBookingData.price
-          ? formatPrice(savedBookingData.price)
-          : "-"
+        const reservationId = document.getElementById("reservation-id")
+        if (reservationId) {
+          reservationId.textContent = savedBookingData.orderId || orderId
+        }
+
+        const reservationName = document.getElementById("reservation-name")
+        if (reservationName) {
+          reservationName.textContent = savedBookingData.customerName || window.userData?.nama_lengkap || "-"
+        }
+
+        const reservationService = document.getElementById("reservation-service")
+        if (reservationService) {
+          reservationService.textContent = savedBookingData.serviceName || "-"
+        }
+
+        const reservationDatetime = document.getElementById("reservation-datetime")
+        if (reservationDatetime) {
+          reservationDatetime.textContent = (savedBookingData.bookingDate ? savedBookingData.bookingDate + ", " : "") + (savedBookingData.bookingTime || "-")
+        }
+
+        const reservationPrice = document.getElementById("reservation-price")
+        if (reservationPrice) {
+          reservationPrice.textContent = savedBookingData.price ? formatPrice(savedBookingData.price) : "-"
+        }
       }
 
       // Remove data from localStorage after use
@@ -937,14 +1143,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     notification.className = `fixed top-20 right-4 ${bgColor} border-l-4 ${borderColor} ${textColor} p-4 rounded shadow-md z-50 max-w-sm`
+    notification.style.maxWidth = 'calc(100vw - 2rem)'
     notification.innerHTML = `
       <div class="flex items-start">
-          <div class="py-1 mr-3"><i class="${icon} text-xl"></i></div>
-          <div class="flex-1">
-              <p class="font-bold">${title}</p>
-              <p class="text-sm">${message}</p>
-          </div>
-          <button class="ml-2 text-lg leading-none hover:opacity-70" onclick="this.parentElement.parentElement.remove()">&times;</button>
+        <div class="py-1 mr-3"><i class="${icon} text-xl"></i></div>
+        <div class="flex-1">
+          <p class="font-bold text-sm">${title}</p>
+          <p class="text-xs">${message}</p>
+        </div>
+        <button class="ml-2 text-lg leading-none hover:opacity-70" onclick="this.parentElement.parentElement.remove()">&times;</button>
       </div>
     `
     document.body.appendChild(notification)
@@ -962,4 +1169,15 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }, 8000)
   }
+
+  // Prevent zoom on iOS when focusing inputs
+  if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+    const viewport = document.querySelector('meta[name="viewport"]')
+    if (viewport) {
+      viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
+    }
+  }
+
+  // Initialize time slots for today on page load
+  updateTimeSlotsForDate(new Date().toISOString().split('T')[0])
 })

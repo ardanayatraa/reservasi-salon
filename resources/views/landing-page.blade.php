@@ -49,13 +49,44 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&display=swap');
 
-        html {
+        /* Prevent horizontal scroll */
+        html,
+        body {
+            overflow-x: hidden;
+            max-width: 100vw;
             scroll-behavior: smooth;
         }
 
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #FFFFFF;
+        }
+
+        /* Ensure all containers respect viewport width */
+        * {
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .container {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 1200px;
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
         }
 
         .font-serif {
@@ -120,7 +151,7 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
-        /* Modal Styles */
+        /* Modal Styles - Fixed for mobile */
         .modal {
             display: none;
             position: fixed;
@@ -131,15 +162,30 @@
             background-color: rgba(0, 0, 0, 0.5);
             z-index: 1000;
             overflow-y: auto;
+            padding: 1rem;
         }
 
         .modal-content {
             background-color: #fff;
-            margin: 2rem auto;
+            margin: 0 auto;
             max-width: 800px;
+            width: 100%;
             border-radius: 0.5rem;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             position: relative;
+            max-height: calc(100vh - 2rem);
+            overflow-y: auto;
+        }
+
+        @media (max-width: 767px) {
+            .modal {
+                padding: 0.5rem;
+            }
+
+            .modal-content {
+                max-height: calc(100vh - 1rem);
+                border-radius: 0.25rem;
+            }
         }
 
         .modal-close {
@@ -150,18 +196,27 @@
             cursor: pointer;
             color: #6b7280;
             transition: color 0.3s ease;
+            z-index: 10;
         }
 
         .modal-close:hover {
             color: #1A1A1A;
         }
 
-        /* Stepper Styles */
+        /* Stepper Styles - Mobile responsive */
         .stepper {
             display: flex;
             justify-content: space-between;
             margin-bottom: 2rem;
             position: relative;
+            padding: 0 1rem;
+        }
+
+        @media (max-width: 767px) {
+            .stepper {
+                margin-bottom: 1rem;
+                padding: 0 0.5rem;
+            }
         }
 
         .stepper::before {
@@ -188,6 +243,15 @@
             font-weight: 600;
             position: relative;
             z-index: 2;
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 767px) {
+            .step {
+                width: 32px;
+                height: 32px;
+                font-size: 0.75rem;
+            }
         }
 
         .step.active {
@@ -221,13 +285,53 @@
             transition: width 0.3s ease;
         }
 
+        /* Date picker styles */
+        .date-picker {
+            position: relative;
+        }
+
+        .date-picker input[type="date"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            background-color: white;
+            color: #374151;
+        }
+
+        .date-picker input[type="date"]:focus {
+            outline: none;
+            border-color: #FF6B9D;
+            box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.1);
+        }
+
+        .date-picker input[type="date"]:disabled {
+            background-color: #f9fafb;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* Time slot responsive grid */
         .time-slot {
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
+            padding: 0.75rem;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
         }
 
-        .time-slot:hover {
+        @media (max-width: 767px) {
+            .time-slot {
+                padding: 0.5rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        .time-slot:hover:not(.disabled):not(.unavailable) {
             border-color: #FF6B9D;
             background-color: #fff0f5;
         }
@@ -235,6 +339,8 @@
         .time-slot.selected {
             border-color: #FF6B9D;
             background-color: #fff0f5;
+            color: #FF6B9D;
+            font-weight: 600;
         }
 
         .time-slot.unavailable {
@@ -249,13 +355,25 @@
             border-color: #dc2626 !important;
         }
 
+        .time-slot.disabled {
+            background-color: #f3f4f6 !important;
+            color: #9ca3af !important;
+            cursor: not-allowed !important;
+            opacity: 0.5;
+        }
+
+        .time-slot.disabled:hover {
+            background-color: #f3f4f6 !important;
+            border-color: #e5e7eb !important;
+        }
+
         .time-slot.checking {
             background-color: #fef3c7;
             border-color: #f59e0b;
             cursor: wait;
         }
 
-        /* Styling untuk layanan yang dipilih */
+        /* Service selection responsive */
         .selected-service {
             background-color: #fff0f5;
             border-left: 3px solid #FF6B9D;
@@ -263,10 +381,53 @@
             margin-bottom: 8px;
             border-radius: 4px;
             transition: all 0.3s ease;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .selected-service:hover {
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive table */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-responsive table {
+            min-width: 600px;
+        }
+
+        @media (max-width: 767px) {
+            .table-responsive table {
+                min-width: 500px;
+                font-size: 0.75rem;
+            }
+
+            .table-responsive th,
+            .table-responsive td {
+                padding: 0.5rem 0.25rem;
+            }
+        }
+
+        /* Prevent text overflow */
+        .text-truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Grid responsive fixes */
+        .grid-responsive {
+            display: grid;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .grid-responsive {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
         }
 
         /* Availability indicator */
@@ -303,11 +464,11 @@
 <body>
     <!-- Navigation -->
     <nav class="fixed w-full z-50 bg-white bg-opacity-95 shadow-sm">
-        <div class="container mx-auto px-6 py-4">
+        <div class="container mx-auto px-4 py-4">
             <div class="flex justify-between items-center">
                 <a href="/" class="flex items-center">
-                    <span class="text-3xl font-serif font-bold text-primary">DEWI</span>
-                    <span class="ml-2 text-lg font-light text-dark">BEAUTY SALON</span>
+                    <span class="text-2xl md:text-3xl font-serif font-bold text-primary">DEWI</span>
+                    <span class="ml-2 text-sm md:text-lg font-light text-dark">BEAUTY SALON</span>
                 </a>
 
                 <div class="hidden md:flex space-x-8">
@@ -323,20 +484,22 @@
 
                 <div class="flex items-center space-x-4">
                     @guest('pelanggan')
-                        <a href="/login" class="hidden md:block px-6 py-2 btn-outline rounded-sm font-light text-sm">
+                        <a href="/login"
+                            class="hidden md:block px-4 lg:px-6 py-2 btn-outline rounded-sm font-light text-sm">
                             MASUK
                         </a>
                     @else
                         <form action="/logout" method="POST" class="hidden md:block">
                             @csrf
-                            <button type="submit" class="px-6 py-2 btn-outline rounded-sm font-light text-sm">
+                            <button type="submit" class="px-4 lg:px-6 py-2 btn-outline rounded-sm font-light text-sm">
                                 KELUAR
                             </button>
                         </form>
                     @endguest
 
                     @auth('admin')
-                        <a href="/dashboard" class="hidden md:block px-6 py-2 btn-outline rounded-sm font-light text-sm">
+                        <a href="/dashboard"
+                            class="hidden md:block px-4 lg:px-6 py-2 btn-outline rounded-sm font-light text-sm">
                             DASHBOARD ADMIN
                         </a>
                     @endauth
@@ -385,31 +548,30 @@
     <section id="home" class="relative h-screen flex items-center justify-center bg-cover bg-center"
         style="background-image: url('https://images.unsplash.com/photo-1470259078422-826894b933aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80');">
         <div class="absolute inset-0 gradient-overlay"></div>
-        <div class="container mx-auto px-6 z-10 text-center">
+        <div class="container mx-auto px-4 z-10 text-center">
             <h1 data-aos="fade-up" data-aos-duration="1000"
-                class="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight text-shadow">
+                class="text-3xl sm:text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight text-shadow">
                 TINGKATKAN <br><span class="text-primary">KECANTIKAN ANDA</span>
             </h1>
             <p data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200"
-                class="text-lg md:text-xl text-white mb-10 max-w-xl mx-auto font-light">
+                class="text-base md:text-lg lg:text-xl text-white mb-10 max-w-xl mx-auto font-light px-4">
                 Nikmati perawatan kecantikan premium dalam lingkungan yang mewah dan menenangkan
             </p>
             <div data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400"
-                class="flex flex-col sm:flex-row justify-center gap-6">
+                class="flex flex-col sm:flex-row justify-center gap-6 px-4">
                 <a href="#services"
-                    class="px-8 py-3 btn-primary rounded-sm font-light text-sm uppercase tracking-wider">
+                    class="px-6 md:px-8 py-3 btn-primary rounded-sm font-light text-sm uppercase tracking-wider">
                     Layanan Kami
                 </a>
-
             </div>
         </div>
     </section>
 
     <!-- About Section -->
-    <section id="about" class="py-24 bg-white">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row items-center gap-16">
-                <div data-aos="fade-right" class="md:w-1/2">
+    <section id="about" class="py-16 md:py-24 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center gap-8 lg:gap-16">
+                <div data-aos="fade-right" class="w-full md:w-1/2">
                     <div class="relative">
                         <img src="https://images.unsplash.com/photo-1470259078422-826894b933aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80"
                             alt="Interior Salon" class="w-full h-auto object-cover">
@@ -419,16 +581,16 @@
                     </div>
                 </div>
 
-                <div data-aos="fade-left" class="md:w-1/2">
+                <div data-aos="fade-left" class="w-full md:w-1/2">
                     <h6 class="text-primary font-light tracking-widest mb-2">TENTANG KAMI</h6>
-                    <h2 class="text-4xl font-serif font-bold text-dark mb-6">Seni Kecantikan</h2>
-                    <p class="text-gray-600 mb-6 leading-relaxed">
+                    <h2 class="text-2xl md:text-4xl font-serif font-bold text-dark mb-6">Seni Kecantikan</h2>
+                    <p class="text-gray-600 mb-6 leading-relaxed text-sm md:text-base">
                         Didirikan pada tahun 2005, Dewi Beauty Salon telah menjadi tempat perawatan kecantikan dan
                         kesehatan selama hampir dua dekade. Perjalanan kami dimulai dengan visi sederhana: menciptakan
                         tempat di mana pelanggan dapat menikmati perawatan kecantikan terbaik dalam suasana mewah dan
                         menenangkan.
                     </p>
-                    <p class="text-gray-600 mb-8 leading-relaxed">
+                    <p class="text-gray-600 mb-8 leading-relaxed text-sm md:text-base">
                         Dinamai dari dewi kecantikan Bali, Dewi, salon kami mewujudkan esensi ilahi kecantikan yang ada
                         pada setiap individu. Kami percaya bahwa kecantikan sejati berasal dari penghormatan terhadap
                         keunikan fitur seseorang dan meningkatkannya dengan perawatan ahli dan produk premium.
@@ -463,35 +625,36 @@
     </section>
 
     <!-- Services Section -->
-
-    <section id="services" class="py-24 bg-secondary">
-        <div class="container mx-auto px-6">
+    <section id="services" class="py-16 md:py-24 bg-secondary">
+        <div class="container mx-auto px-4">
             <div class="text-center mb-16">
                 <h6 data-aos="fade-up" class="text-primary font-light tracking-widest mb-2">LAYANAN KAMI</h6>
-                <h2 data-aos="fade-up" data-aos-delay="100" class="text-4xl font-serif font-bold text-dark mb-6">
+                <h2 data-aos="fade-up" data-aos-delay="100"
+                    class="text-2xl md:text-4xl font-serif font-bold text-dark mb-6">
                     Perawatan Kecantikan Premium</h2>
-                <p data-aos="fade-up" data-aos-delay="200" class="text-gray-600 w-full mx-auto">
+                <p data-aos="fade-up" data-aos-delay="200"
+                    class="text-gray-600 max-w-2xl mx-auto text-sm md:text-base px-4">
                     Nikmati pilihan perawatan kecantikan kami yang dirancang khusus untuk meningkatkan kecantikan alami
                     Anda dan memberikan pengalaman yang benar-benar mewah.
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                 @foreach ($services as $service)
                     <div data-aos="fade-up" data-aos-delay="{{ $loop->index * 200 }}"
                         class="service-card bg-white shadow-sm">
-                        <div class="relative h-64 overflow-hidden">
+                        <div class="relative h-48 md:h-64 overflow-hidden">
                             <img src="{{ asset('storage/' . $service->foto) }}" alt="{{ $service->nama_perawatan }}"
                                 class="w-full h-full object-cover hover-scale">
-
                         </div>
-                        <div class="p-6">
-                            <h3 class="text-xl font-serif font-bold text-dark mb-2">{{ $service->nama_perawatan }}</h3>
+                        <div class="p-4 md:p-6">
+                            <h3 class="text-lg md:text-xl font-serif font-bold text-dark mb-2">
+                                {{ $service->nama_perawatan }}</h3>
                             <p class="text-gray-600 mb-4 text-sm">
                                 {{ $service->deskripsi ?? 'Perawatan premium untuk kecantikan Anda' }}
                             </p>
                             <div class="flex justify-between items-center">
-                                <span class="text-primary font-serif text-xl">Rp
+                                <span class="text-primary font-serif text-lg md:text-xl">Rp
                                     {{ number_format($service->harga, 0, ',', '.') }}</span>
                                 <button
                                     class="text-primary hover:text-accent transition duration-300 text-sm book-service-btn"
@@ -503,18 +666,18 @@
                             </div>
                         </div>
                     </div>
-                    <input type="hidden" id="selected-time" name="selected_time" />
                 @endforeach
             </div>
         </div>
     </section>
 
     <!-- Testimonials Section -->
-    <section id="testimonials" class="py-24 bg-white">
-        <div class="container mx-auto px-6">
+    <section id="testimonials" class="py-16 md:py-24 bg-white">
+        <div class="container mx-auto px-4">
             <div class="text-center mb-16">
                 <h6 data-aos="fade-up" class="text-primary font-light tracking-widest mb-2">TESTIMONI</h6>
-                <h2 data-aos="fade-up" data-aos-delay="100" class="text-4xl font-serif font-bold text-dark mb-6">Apa
+                <h2 data-aos="fade-up" data-aos-delay="100"
+                    class="text-2xl md:text-4xl font-serif font-bold text-dark mb-6">Apa
                     Kata Klien Kami</h2>
                 <div data-aos="fade-up" data-aos-delay="200" class="flex items-center justify-center mb-6">
                     <div class="flex items-center">
@@ -528,13 +691,13 @@
                         <span class="ml-2 text-dark font-medium">4.9/5</span>
                     </div>
                     <span class="mx-3 text-gray-400">|</span>
-                    <span class="text-gray-600">Berdasarkan 52 ulasan</span>
+                    <span class="text-gray-600 text-sm">Berdasarkan 52 ulasan</span>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                 <!-- Testimonial 1 -->
-                <div data-aos="fade-up" data-aos-delay="0" class="review-card bg-white p-8 shadow-sm">
+                <div data-aos="fade-up" data-aos-delay="0" class="review-card bg-white p-6 md:p-8 shadow-sm">
                     <div class="flex text-primary mb-4">
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
@@ -563,7 +726,7 @@
                 </div>
 
                 <!-- Testimonial 2 -->
-                <div data-aos="fade-up" data-aos-delay="200" class="review-card bg-white p-8 shadow-sm">
+                <div data-aos="fade-up" data-aos-delay="200" class="review-card bg-white p-6 md:p-8 shadow-sm">
                     <div class="flex text-primary mb-4">
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
@@ -592,7 +755,7 @@
                 </div>
 
                 <!-- Testimonial 3 -->
-                <div data-aos="fade-up" data-aos-delay="400" class="review-card bg-white p-8 shadow-sm">
+                <div data-aos="fade-up" data-aos-delay="400" class="review-card bg-white p-6 md:p-8 shadow-sm">
                     <div class="flex text-primary mb-4">
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
@@ -624,7 +787,7 @@
             <!-- More Reviews Button -->
             <div class="text-center mt-10">
                 <a href="https://g.co/kgs/WraDjHe" target="_blank"
-                    class="inline-block px-8 py-3 btn-outline rounded-sm font-light text-sm uppercase tracking-wider">
+                    class="inline-block px-6 md:px-8 py-3 btn-outline rounded-sm font-light text-sm uppercase tracking-wider">
                     Lihat Semua Ulasan
                 </a>
             </div>
@@ -632,19 +795,21 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-24 bg-cover bg-center relative"
+    <section class="py-16 md:py-24 bg-cover bg-center relative"
         style="background-image: url('https://images.unsplash.com/photo-1470259078422-826894b933aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80');">
         <div class="absolute inset-0 gradient-overlay"></div>
-        <div class="container mx-auto px-6 relative z-10">
-            <div class="w-full mx-auto text-center">
-                <h2 data-aos="fade-up" class="text-4xl font-serif font-bold text-white mb-6">Rasakan Kecantikan Mewah
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 data-aos="fade-up" class="text-2xl md:text-4xl font-serif font-bold text-white mb-6">Rasakan
+                    Kecantikan Mewah
                 </h2>
-                <p data-aos="fade-up" data-aos-delay="200" class="text-lg text-white mb-10 font-light">
+                <p data-aos="fade-up" data-aos-delay="200"
+                    class="text-base md:text-lg text-white mb-10 font-light px-4">
                     Manjakan diri Anda dengan layanan premium kami dan temukan perbedaan yang dibuat oleh kemewahan.
                 </p>
                 <div data-aos="fade-up" data-aos-delay="400">
                     <a href="#history"
-                        class="inline-block px-8 py-3 btn-primary rounded-sm font-light text-sm uppercase tracking-wider">
+                        class="inline-block px-6 md:px-8 py-3 btn-primary rounded-sm font-light text-sm uppercase tracking-wider">
                         Reservasi Sekarang
                     </a>
                 </div>
@@ -653,24 +818,26 @@
     </section>
 
     <!-- History Section -->
-    <section id="history" class="py-24 bg-white">
-        <div class="container mx-auto px-6">
+    <section id="history" class="py-16 md:py-24 bg-white">
+        <div class="container mx-auto px-4">
             <div class="text-center mb-16">
                 <h6 data-aos="fade-up" class="text-primary font-light tracking-widest mb-2">RIWAYAT PEMESANAN</h6>
-                <h2 data-aos="fade-up" data-aos-delay="100" class="text-4xl font-serif font-bold text-dark mb-6">
+                <h2 data-aos="fade-up" data-aos-delay="100"
+                    class="text-2xl md:text-4xl font-serif font-bold text-dark mb-6">
                     Cek Riwayat Anda
                 </h2>
-                <p data-aos="fade-up" data-aos-delay="200" class="text-gray-600 w-full mx-auto">
+                <p data-aos="fade-up" data-aos-delay="200"
+                    class="text-gray-600 max-w-2xl mx-auto text-sm md:text-base px-4">
                     Masukkan email Anda untuk melihat riwayat pemesanan sebelumnya.
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
                 {{-- Kolom Kiri: Form & Tabel Riwayat --}}
                 <div data-aos="fade-right">
                     {{-- Form Cek Riwayat --}}
                     <form action="{{ url()->current() }}#history" method="GET"
-                        class="bg-secondary p-8 shadow-sm mb-8">
+                        class="bg-secondary p-6 md:p-8 shadow-sm mb-8">
                         <div class="mb-6">
                             <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Alamat
                                 Email</label>
@@ -688,53 +855,56 @@
                     {{-- Hanya tampilkan kalau sudah submit --}}
                     @if (!is_null($histories))
                         @if ($histories->count())
-                            <div class="overflow-x-auto">
+                            <div class="table-responsive">
                                 <table class="min-w-full bg-white shadow-sm rounded-sm">
                                     <thead class="bg-gray-50">
                                         <tr>
                                             <th
-                                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                class="px-2 md:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                 No</th>
                                             <th
-                                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                class="px-2 md:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                 Tanggal</th>
                                             <th
-                                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                class="px-2 md:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                 Waktu</th>
                                             <th
-                                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                class="px-2 md:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                 Layanan</th>
                                             <th
-                                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                class="px-2 md:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                 Total</th>
                                             <th
-                                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                class="px-2 md:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                 Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($histories as $idx => $order)
                                             <tr class="{{ $idx % 2 ? 'bg-gray-50' : '' }}">
-                                                <td class="px-4 py-2 text-sm">{{ $histories->firstItem() + $idx }}
+                                                <td class="px-2 md:px-4 py-2 text-sm">
+                                                    {{ $histories->firstItem() + $idx }}
                                                 </td>
-                                                <td class="px-4 py-2 text-sm">
+                                                <td class="px-2 md:px-4 py-2 text-sm">
                                                     {{ \Carbon\Carbon::parse($order->tanggal_pemesanan)->format('d M Y') }}
                                                 </td>
-                                                <td class="px-4 py-2 text-sm">{{ $order->waktu }}</td>
-                                                <td class="px-4 py-2 text-sm">
-                                                    @if ($order->bookeds->count() > 0)
-                                                        @foreach ($order->bookeds as $booked)
-                                                            {{ $booked->perawatan->nama_perawatan }}@if (!$loop->last)
-                                                                ,
-                                                            @endif
-                                                        @endforeach
-                                                    @else
-                                                        -
-                                                    @endif
+                                                <td class="px-2 md:px-4 py-2 text-sm">{{ $order->waktu }}</td>
+                                                <td class="px-2 md:px-4 py-2 text-sm">
+                                                    <div class="text-truncate max-w-32">
+                                                        @if ($order->bookeds->count() > 0)
+                                                            @foreach ($order->bookeds as $booked)
+                                                                {{ $booked->perawatan->nama_perawatan }}@if (!$loop->last)
+                                                                    ,
+                                                                @endif
+                                                            @endforeach
+                                                        @else
+                                                            -
+                                                        @endif
+                                                    </div>
                                                 </td>
-                                                <td class="px-4 py-2 text-sm">Rp
+                                                <td class="px-2 md:px-4 py-2 text-sm">Rp
                                                     {{ number_format($order->total, 0, ',', '.') }}</td>
-                                                <td class="px-4 py-2 text-sm">
+                                                <td class="px-2 md:px-4 py-2 text-sm">
                                                     <span
                                                         class="px-2 py-1 text-xs rounded-full
                                                         @if ($order->status_pemesanan == 'confirmed') bg-green-100 text-green-800
@@ -754,7 +924,7 @@
                                 {{ $histories->links() }}
                             </div>
                         @else
-                            <p class="text-center text-gray-600">
+                            <p class="text-center text-gray-600 text-sm">
                                 Tidak ada riwayat untuk email <strong>{{ $email }}</strong>.
                             </p>
                         @endif
@@ -764,7 +934,7 @@
                 {{-- Kolom Kanan: Informasi Kontak --}}
                 <div data-aos="fade-left">
                     <div class="mb-8">
-                        <h3 class="text-2xl font-serif font-bold text-dark mb-6">Informasi Kontak</h3>
+                        <h3 class="text-xl md:text-2xl font-serif font-bold text-dark mb-6">Informasi Kontak</h3>
 
                         <div class="space-y-6">
                             <div class="flex items-start">
@@ -813,7 +983,7 @@
                     </div>
 
                     <div>
-                        <h3 class="text-2xl font-serif font-bold text-dark mb-6">Ikuti Kami</h3>
+                        <h3 class="text-xl md:text-2xl font-serif font-bold text-dark mb-6">Ikuti Kami</h3>
                         <div class="flex space-x-4">
                             <a href="#"
                                 class="w-10 h-10 border border-primary text-primary hover:bg-primary hover:text-white flex items-center justify-center transition duration-300">
@@ -840,12 +1010,12 @@
 
     <!-- Footer -->
     <footer class="bg-dark text-white py-12">
-        <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div>
                     <a href="#" class="flex items-center mb-6">
-                        <span class="text-3xl font-serif font-bold text-primary">DEWI</span>
-                        <span class="ml-2 text-lg font-light text-white">BEAUTY SALON</span>
+                        <span class="text-2xl md:text-3xl font-serif font-bold text-primary">DEWI</span>
+                        <span class="ml-2 text-base md:text-lg font-light text-white">BEAUTY SALON</span>
                     </a>
                     <p class="text-gray-400 mb-6 text-sm">
                         Temukan kecantikan ilahi dalam diri Anda di salon kecantikan mewah terbaik di Bali.
@@ -936,18 +1106,18 @@
         <div class="modal-content">
             <span class="modal-close">&times;</span>
 
-            <div class="p-6 mx-4">
+            <div class="p-4 md:p-6">
                 <!-- Stepper -->
-                <div class="stepper mb-8">
+                <div class="stepper mb-6 md:mb-8">
                     <div class="progress-bar" id="progress-bar"></div>
                     <div class="step active" data-step="1">1</div>
                     <div class="step" data-step="2">2</div>
                 </div>
 
                 <!-- Step Labels -->
-                <div class="flex justify-between text-sm text-gray-600 mb-8 px-4">
-                    <div class="text-center" style="width: 100px; margin-left: -30px;">Detail & Waktu</div>
-                    <div class="text-center" style="width: 100px; margin-left: -30px;">Pembayaran</div>
+                <div class="flex justify-between text-xs md:text-sm text-gray-600 mb-6 md:mb-8 px-2 md:px-4">
+                    <div class="text-center flex-1">Detail & Waktu</div>
+                    <div class="text-center flex-1">Pembayaran</div>
                 </div>
 
                 <form id="booking-form" action="{{ route('book.service') }}" method="POST">
@@ -957,7 +1127,7 @@
 
                     <!-- Step 1: Detail Paket & Pilih Waktu -->
                     <div class="step-content active" id="step-1">
-                        <h3 class="text-2xl font-serif font-bold text-dark mb-6">Pilih Layanan & Waktu</h3>
+                        <h3 class="text-xl md:text-2xl font-serif font-bold text-dark mb-6">Pilih Layanan & Waktu</h3>
 
                         <!-- Container untuk layanan yang dipilih -->
                         <div id="selected-services-container" class="mb-6">
@@ -967,8 +1137,9 @@
                         {{-- Container dinamis untuk baris layanan --}}
                         <div id="services-container" class="space-y-3 mb-6">
                             {{-- Baris template pertama --}}
-                            <div class="service-row flex items-center space-x-2">
-                                <select name="service_select" class="service-select border p-2 rounded flex-1">
+                            <div
+                                class="service-row flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-2">
+                                <select name="service_select" class="service-select border p-2 rounded flex-1 w-full">
                                     <option value="">-- Pilih Layanan --</option>
                                     @foreach ($services as $s)
                                         <option value="{{ $s->id_perawatan }}" data-id="{{ $s->id_perawatan }}"
@@ -979,13 +1150,14 @@
                                     @endforeach
                                 </select>
                                 <button type="button"
-                                    class="add-to-selected px-3 py-1 bg-primary text-white rounded hover:bg-accent transition">
+                                    class="add-to-selected px-3 py-2 bg-primary text-white rounded hover:bg-accent transition w-full md:w-auto">
                                     Tambah
                                 </button>
                             </div>
                         </div>
 
-                        <button type="button" id="add-service-row" class="mb-4 text-primary hover:underline">
+                        <button type="button" id="add-service-row"
+                            class="mb-4 text-primary hover:underline text-sm">
                             + Tambah Layanan Lainnya
                         </button>
 
@@ -996,36 +1168,54 @@
                             Selesai (jika mulai dipilih): <span id="displayEnd">–</span>
                         </div>
 
+                        {{-- Pilih Tanggal --}}
+                        <div class="mb-6">
+                            <label for="booking-date-picker" class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-calendar-alt text-primary mr-2"></i>Pilih Tanggal
+                            </label>
+                            <div class="date-picker">
+                                <input type="date" id="booking-date-picker"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-primary"
+                                    value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Pilih tanggal untuk melihat slot waktu yang tersedia
+                            </p>
+                        </div>
+
                         <!-- Employee availability info -->
                         <div id="employee-info" class="mb-4"></div>
 
                         {{-- Pilih Shift & Slot --}}
-                        @foreach ($shifts as $shift)
-                            <div class="mb-6 shift-block" data-shift-id="{{ $shift->id_shift }}"
-                                data-end="{{ \Carbon\Carbon::parse($shift->end_time)->format('H:i') }}">
-                                <h4 class="font-semibold mb-2">
-                                    {{ $shift->nama_shift }}
-                                    <span class="text-sm text-gray-500">
-                                        ({{ \Carbon\Carbon::parse($shift->start_time)->format('H:i') }}
-                                        – {{ \Carbon\Carbon::parse($shift->end_time)->format('H:i') }})
-                                    </span>
-                                </h4>
-                                <div class="grid grid-cols-5 gap-2">
-                                    @foreach ($timeSlots[$shift->nama_shift] as $time)
-                                        <div class="time-slot border p-3 text-center cursor-pointer relative"
-                                            data-time="{{ $time }}"
-                                            onclick="selectSlot('{{ $shift->id_shift }}','{{ $time }}')">
-                                            {{ $time }}
-                                            <div class="availability-indicator" style="display: none;"></div>
-                                        </div>
-                                    @endforeach
+                        <div id="time-slots-container">
+                            @foreach ($shifts as $shift)
+                                <div class="mb-6 shift-block" data-shift-id="{{ $shift->id_shift }}"
+                                    data-start="{{ \Carbon\Carbon::parse($shift->start_time)->format('H:i') }}"
+                                    data-end="{{ \Carbon\Carbon::parse($shift->end_time)->format('H:i') }}">
+                                    <h4 class="font-semibold mb-2 text-sm md:text-base">
+                                        {{ $shift->nama_shift }}
+                                        <span class="text-xs md:text-sm text-gray-500">
+                                            ({{ \Carbon\Carbon::parse($shift->start_time)->format('H:i') }}
+                                            – {{ \Carbon\Carbon::parse($shift->end_time)->format('H:i') }})
+                                        </span>
+                                    </h4>
+                                    <div class="grid grid-cols-3 md:grid-cols-5 gap-2"
+                                        data-shift-name="{{ $shift->nama_shift }}">
+                                        @foreach ($timeSlots[$shift->nama_shift] as $time)
+                                            <div class="time-slot border cursor-pointer relative"
+                                                data-time="{{ $time }}"
+                                                onclick="selectSlot('{{ $shift->id_shift }}','{{ $time }}')">
+                                                {{ $time }}
+                                                <div class="availability-indicator" style="display: none;"></div>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
-                            </div>
-                        @endforeach
+                            @endforeach
+                        </div>
 
                         <div class="flex justify-end">
-                            <button type="button" id="next-to-step-2" class="px-6 py-2 btn-primary rounded-md"
-                                disabled>
+                            <button type="button" id="next-to-step-2"
+                                class="px-4 md:px-6 py-2 btn-primary rounded-md text-sm md:text-base" disabled>
                                 Lanjutkan
                             </button>
                         </div>
@@ -1034,11 +1224,11 @@
                     <!-- Step 2: Payment -->
                     <div class="step-content" id="step-2">
                         <div class="bg-white rounded-lg">
-                            <h3 class="text-2xl font-serif font-bold text-dark mb-6">Detail Pembayaran</h3>
+                            <h3 class="text-xl md:text-2xl font-serif font-bold text-dark mb-6">Detail Pembayaran</h3>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                                 <div>
-                                    <h4 class="font-serif font-bold text-lg mb-4">Informasi Pelanggan</h4>
+                                    <h4 class="font-serif font-bold text-base md:text-lg mb-4">Informasi Pelanggan</h4>
 
                                     <div class="space-y-4">
                                         {{-- Nama Lengkap --}}
@@ -1046,7 +1236,7 @@
                                             <label class="block text-sm font-medium text-gray-700 mb-1">Nama
                                                 Lengkap</label>
                                             <p
-                                                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-800">
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-800 text-sm">
                                                 {{ $user->nama_lengkap ?? '' }}
                                             </p>
                                         </div>
@@ -1055,7 +1245,7 @@
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                                             <p
-                                                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-800">
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-800 text-sm">
                                                 {{ $user->email ?? '' }}
                                             </p>
                                         </div>
@@ -1065,7 +1255,7 @@
                                             <label class="block text-sm font-medium text-gray-700 mb-1">Nomor
                                                 Telepon</label>
                                             <p
-                                                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-800">
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-800 text-sm">
                                                 {{ $user->no_telepon ?? '' }}
                                             </p>
                                         </div>
@@ -1074,7 +1264,7 @@
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
                                             <p
-                                                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-800">
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-800 text-sm">
                                                 {{ $user->alamat ?? '' }}
                                             </p>
                                         </div>
@@ -1082,18 +1272,18 @@
                                 </div>
 
                                 <div>
-                                    <h4 class="font-serif font-bold text-lg mb-4">Ringkasan Pemesanan</h4>
+                                    <h4 class="font-serif font-bold text-base md:text-lg mb-4">Ringkasan Pemesanan</h4>
 
                                     <div class="bg-gray-50 p-4 rounded-md mb-6">
                                         <div class="space-y-3">
                                             <div id="summary-services-list" class="mb-3">
                                                 <!-- Daftar layanan akan ditampilkan di sini -->
                                             </div>
-                                            <div class="flex justify-between">
+                                            <div class="flex justify-between text-sm">
                                                 <span class="text-gray-600">Tanggal:</span>
                                                 <span class="font-medium" id="summary-date">-</span>
                                             </div>
-                                            <div class="flex justify-between">
+                                            <div class="flex justify-between text-sm">
                                                 <span class="text-gray-600">Waktu:</span>
                                                 <span class="font-medium" id="summary-time">-</span>
                                             </div>
@@ -1106,13 +1296,13 @@
                                         </div>
                                     </div>
 
-                                    <h4 class="font-serif font-bold text-lg mb-4">Metode Pembayaran</h4>
+                                    <h4 class="font-serif font-bold text-base md:text-lg mb-4">Metode Pembayaran</h4>
 
                                     <div class="space-y-3">
                                         <div class="border border-gray-300 rounded-md p-3 flex items-center">
                                             <input type="radio" id="payment-midtrans" name="payment_method"
                                                 value="midtrans" class="mr-3" checked>
-                                            <label for="payment-midtrans" class="flex items-center">
+                                            <label for="payment-midtrans" class="flex items-center text-sm">
                                                 <span class="mr-2">Midtrans</span>
                                                 <img src="https://midtrans.com/assets/images/logo-midtrans-color.png"
                                                     alt="Midtrans" class="h-6">
@@ -1124,10 +1314,11 @@
                                 </div>
                             </div>
 
-                            <div class="flex justify-between mt-8">
+                            <div class="flex flex-col md:flex-row justify-between gap-4 mt-8">
                                 <button type="button" id="back-to-step-1"
-                                    class="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition duration-300">Kembali</button>
-                                <button type="button" id="pay-button" class="px-6 py-2 btn-primary rounded-md">Bayar
+                                    class="px-4 md:px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition duration-300 text-sm md:text-base">Kembali</button>
+                                <button type="button" id="pay-button"
+                                    class="px-4 md:px-6 py-2 btn-primary rounded-md text-sm md:text-base">Bayar
                                     Sekarang</button>
                             </div>
                         </div>
@@ -1138,38 +1329,39 @@
                 <div class="step-content" id="step-3">
                     <div class="bg-white rounded-lg text-center">
                         <div class="mb-6 text-primary">
-                            <i class="fas fa-check-circle text-6xl"></i>
+                            <i class="fas fa-check-circle text-4xl md:text-6xl"></i>
                         </div>
 
-                        <h3 class="text-2xl font-serif font-bold text-dark mb-4">Transaksi Berhasil!</h3>
-                        <p class="text-gray-600 mb-8">Terima kasih atas pemesanan Anda. Detail reservasi telah dikirim
+                        <h3 class="text-xl md:text-2xl font-serif font-bold text-dark mb-4">Transaksi Berhasil!</h3>
+                        <p class="text-gray-600 mb-8 text-sm md:text-base px-4">Terima kasih atas pemesanan Anda.
+                            Detail reservasi telah dikirim
                             ke email Anda.</p>
 
-                        <div class="bg-secondary p-6 rounded-md text-left mb-8">
-                            <h4 class="font-serif font-bold text-lg mb-4">Detail Reservasi</h4>
+                        <div class="bg-secondary p-4 md:p-6 rounded-md text-left mb-8">
+                            <h4 class="font-serif font-bold text-base md:text-lg mb-4">Detail Reservasi</h4>
 
                             <div class="space-y-3">
-                                <div class="flex justify-between">
+                                <div class="flex justify-between text-sm">
                                     <span class="text-gray-600">ID Reservasi:</span>
                                     <span class="font-medium" id="reservation-id">DBS-2024-0001</span>
                                 </div>
-                                <div class="flex justify-between">
+                                <div class="flex justify-between text-sm">
                                     <span class="text-gray-600">Nama:</span>
                                     <span class="font-medium" id="reservation-name">-</span>
                                 </div>
-                                <div class="flex justify-between">
+                                <div class="flex justify-between text-sm">
                                     <span class="text-gray-600">Layanan:</span>
                                     <span class="font-medium" id="reservation-service">-</span>
                                 </div>
-                                <div class="flex justify-between">
+                                <div class="flex justify-between text-sm">
                                     <span class="text-gray-600">Tanggal & Waktu:</span>
                                     <span class="font-medium" id="reservation-datetime">-</span>
                                 </div>
-                                <div class="flex justify-between">
+                                <div class="flex justify-between text-sm">
                                     <span class="text-gray-600">Total Pembayaran:</span>
                                     <span class="font-medium text-primary" id="reservation-price">-</span>
                                 </div>
-                                <div class="flex justify-between">
+                                <div class="flex justify-between text-sm">
                                     <span class="text-gray-600">Status:</span>
                                     <span class="font-medium text-green-600">Terkonfirmasi</span>
                                 </div>
@@ -1178,7 +1370,7 @@
 
                         <div class="flex flex-col sm:flex-row justify-center gap-4">
                             <button id="close-booking"
-                                class="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition duration-300">Tutup</button>
+                                class="px-4 md:px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition duration-300 text-sm md:text-base">Tutup</button>
                         </div>
                     </div>
                 </div>
@@ -1189,16 +1381,16 @@
     @if (session('status_message'))
         <div x-data="{ show: true }" x-show="show" x-transition
             class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="z-index: 9999;">
-            <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-4 p-6 relative">
                 <button @click="show = false"
                     class="absolute top-3 right-4 text-gray-500 hover:text-gray-700 text-xl">&times;</button>
 
                 <div class="text-center">
-                    <div class="text-green-500 text-5xl mb-4">
+                    <div class="text-green-500 text-4xl md:text-5xl mb-4">
                         <i class="fas fa-check-circle"></i>
                     </div>
-                    <h3 class="text-2xl font-serif font-bold text-dark mb-2">Transaksi Berhasil!</h3>
-                    <p class="text-gray-600 mb-6">{{ session('status_message') }}</p>
+                    <h3 class="text-xl md:text-2xl font-serif font-bold text-dark mb-2">Transaksi Berhasil!</h3>
+                    <p class="text-gray-600 mb-6 text-sm md:text-base">{{ session('status_message') }}</p>
 
                     <div class="bg-secondary p-4 rounded text-left text-sm mb-6">
                         <h4 class="font-serif font-semibold mb-2">Detail Reservasi</h4>
@@ -1228,7 +1420,7 @@
                     </div>
 
                     <button @click="show = false"
-                        class="px-6 py-2 bg-primary text-white rounded-md hover:bg-pink-600 transition">
+                        class="px-4 md:px-6 py-2 bg-primary text-white rounded-md hover:bg-pink-600 transition text-sm md:text-base">
                         Tutup
                     </button>
                 </div>
