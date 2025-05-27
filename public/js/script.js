@@ -39,29 +39,35 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Function untuk cek ketersediaan real-time
-async function checkTimeSlotAvailability(date, time, totalDuration) {
-  try {
-    const params = new URLSearchParams({
-      date: date,
-      start_time: time,
-      duration: totalDuration
-    });
+    async function checkTimeSlotAvailability(date, time, totalDuration) {
+    try {
+        const params = new URLSearchParams({
+        date: date,
+        start_time: time,
+        duration: totalDuration,
+        })
 
-    const response = await fetch(`/check-availability?${params.toString()}`);
+        const response = await fetch(`/check-availability?${params.toString()}`, {
+        method: "GET",
+        headers: {
+            "X-Requested-With": "XMLHttpRequest",
+        },
+        })
 
-    if (!response.ok) {
-      const raw = await response.text();
-      console.error("Response error:", response.status, raw);
-      throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+        const rawText = await response.text()
+        console.error("❌ HTTP error:", response.status)
+        console.error("📄 Response body:", rawText)
+        throw new Error("Gagal mengambil data availability")
+        }
+
+        const data = await response.json()
+        return data
+    } catch (error) {
+        console.error("💥 Error checking availability:", error)
+        return { available: false, employees: [], slots_available: 0, error: error.message }
     }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error checking availability:", error);
-    return { available: false, employees: [], slots_available: 0 };
-  }
-}
+    }
 
 
   // Function to set active step

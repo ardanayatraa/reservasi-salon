@@ -502,6 +502,7 @@
                             </div>
                         </div>
                     </div>
+                    <input type="hidden" id="selected-time" name="selected_time" />
                 @endforeach
             </div>
         </div>
