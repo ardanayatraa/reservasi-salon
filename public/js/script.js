@@ -47,6 +47,8 @@ document.addEventListener("DOMContentLoaded", () => {
         duration: totalDuration,
         })
 
+
+        console.log("🔍 Checking availability with params:", params.toString())
         const response = await fetch(`/check-availability?${params.toString()}`, {
         method: "GET",
         headers: {
@@ -62,6 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const data = await response.json()
+        console.log("✅ Availability data:", data)
         return data
     } catch (error) {
         console.error("💥 Error checking availability:", error)
