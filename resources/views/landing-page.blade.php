@@ -481,8 +481,9 @@
                     <div data-aos="fade-up" data-aos-delay="{{ $loop->index * 200 }}"
                         class="service-card bg-white shadow-sm">
                         <div class="relative h-64 overflow-hidden">
-                            <img src="{{ $service->foto ?? 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80' }}"
+                            <img src="{{ $service->foto ? asset('storage/' . $service->foto) : 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80' }}"
                                 alt="{{ $service->nama_perawatan }}" class="w-full h-full object-cover hover-scale">
+
                         </div>
                         <div class="p-6">
                             <h3 class="text-xl font-serif font-bold text-dark mb-2">{{ $service->nama_perawatan }}</h3>
