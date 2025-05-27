@@ -808,7 +808,7 @@
                     Manjakan diri Anda dengan layanan premium kami dan temukan perbedaan yang dibuat oleh kemewahan.
                 </p>
                 <div data-aos="fade-up" data-aos-delay="400">
-                    <a href="#history"
+                    <a href="#services"
                         class="inline-block px-6 md:px-8 py-3 btn-primary rounded-sm font-light text-sm uppercase tracking-wider">
                         Reservasi Sekarang
                     </a>
@@ -1090,7 +1090,7 @@
             </div>
 
             <div class="border-t border-gray-800 mt-12 pt-8 text-center">
-                <p class="text-gray-400 text-sm">&copy; 2024 Dewi Beauty Salon. Hak Cipta Dilindungi.</p>
+                <p class="text-gray-400 text-sm">&copy; 2025 Dewi Beauty Salon. Hak Cipta Dilindungi.</p>
             </div>
         </div>
     </footer>
