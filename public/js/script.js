@@ -44,7 +44,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const response = await fetch("/check-availability", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
         },
         body: JSON.stringify({
           date: date,
