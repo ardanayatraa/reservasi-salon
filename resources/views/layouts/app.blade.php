@@ -24,9 +24,29 @@
             transition: all 0.3s ease;
         }
 
+        /* Overlay untuk mobile */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 15;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
+                z-index: 20;
             }
 
             .sidebar.open {
@@ -63,6 +83,9 @@
 </head>
 
 <body class="min-h-screen flex flex-col">
+    <!-- Overlay untuk mobile -->
+    <div id="sidebar-overlay" class="sidebar-overlay md:hidden"></div>
+
     <!-- Header -->
     <header class="bg-white shadow-sm z-10">
         <div class=" mx-auto px-4 py-3 flex justify-between items-center">
@@ -91,7 +114,19 @@
         <aside id="sidebar"
             class="sidebar bg-sidebar-bg text-sidebar-text w-64 fixed inset-y-0 left-0 z-20 md:relative md:translate-x-0 overflow-y-auto">
             <div class="p-6">
-                <div class="mb-8">
+                <!-- Tombol Close untuk Mobile -->
+                <div class="flex justify-between items-center mb-6 md:hidden">
+                    <div>
+                        <h2 class="text-xl font-serif font-bold text-primary">Dashboard</h2>
+                        <p class="text-xs text-gray-400">Kelola salon Anda</p>
+                    </div>
+                    <button id="sidebar-close" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Header untuk Desktop -->
+                <div class="mb-8 hidden md:block">
                     <h2 class="text-xl font-serif font-bold text-primary">Dashboard</h2>
                     <p class="text-xs text-gray-400">Kelola salon Anda</p>
                 </div>
@@ -99,7 +134,7 @@
                 <nav class="space-y-1">
                     {{-- Dashboard --}}
                     <a href="{{ route('dashboard') }}"
-                        class="flex items-center px-4 py-3 rounded-sm
+                        class="sidebar-link flex items-center px-4 py-3 rounded-sm
                        {{ request()->routeIs('dashboard')
                            ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                            : 'text-sidebar-text hover:text-sidebar-hover' }}">
@@ -109,7 +144,7 @@
 
                     {{-- Admin --}}
                     <a href="{{ route('admin.index') }}"
-                        class="flex items-center px-4 py-3 rounded-sm
+                        class="sidebar-link flex items-center px-4 py-3 rounded-sm
                        {{ request()->routeIs('admin.*')
                            ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                            : 'text-sidebar-text hover:text-sidebar-hover' }}">
@@ -119,7 +154,7 @@
 
                     {{-- Booked --}}
                     <a href="{{ route('booked.index') }}"
-                        class="flex items-center px-4 py-3 rounded-sm
+                        class="sidebar-link flex items-center px-4 py-3 rounded-sm
                        {{ request()->routeIs('booked.*')
                            ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                            : 'text-sidebar-text hover:text-sidebar-hover' }}">
@@ -129,7 +164,7 @@
 
                     {{-- Pelanggan --}}
                     <a href="{{ route('pelanggan.index') }}"
-                        class="flex items-center px-4 py-3 rounded-sm
+                        class="sidebar-link flex items-center px-4 py-3 rounded-sm
                        {{ request()->routeIs('pelanggan.*')
                            ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                            : 'text-sidebar-text hover:text-sidebar-hover' }}">
@@ -139,7 +174,7 @@
 
                     {{-- Pembayaran --}}
                     <a href="{{ route('pembayaran.index') }}"
-                        class="flex items-center px-4 py-3 rounded-sm
+                        class="sidebar-link flex items-center px-4 py-3 rounded-sm
                        {{ request()->routeIs('pembayaran.*')
                            ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                            : 'text-sidebar-text hover:text-sidebar-hover' }}">
@@ -149,7 +184,7 @@
 
                     {{-- Pemesanan --}}
                     <a href="{{ route('pemesanan.index') }}"
-                        class="flex items-center px-4 py-3 rounded-sm
+                        class="sidebar-link flex items-center px-4 py-3 rounded-sm
                        {{ request()->routeIs('pemesanan.*')
                            ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                            : 'text-sidebar-text hover:text-sidebar-hover' }}">
@@ -159,7 +194,7 @@
 
                     {{-- Perawatan --}}
                     <a href="{{ route('perawatan.index') }}"
-                        class="flex items-center px-4 py-3 rounded-sm
+                        class="sidebar-link flex items-center px-4 py-3 rounded-sm
                        {{ request()->routeIs('perawatan.*')
                            ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                            : 'text-sidebar-text hover:text-sidebar-hover' }}">
@@ -169,7 +204,7 @@
 
                     {{-- Karyawan --}}
                     <a href="{{ route('karyawan.index') }}"
-                        class="flex items-center px-4 py-3 rounded-sm
+                        class="sidebar-link flex items-center px-4 py-3 rounded-sm
                     {{ request()->routeIs('karyawan.*')
                         ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                         : 'text-sidebar-text hover:text-sidebar-hover' }}">
@@ -179,7 +214,7 @@
 
                     {{-- Shift --}}
                     <a href="{{ route('shift.index') }}"
-                        class="flex items-center px-4 py-3 rounded-sm
+                        class="sidebar-link flex items-center px-4 py-3 rounded-sm
                     {{ request()->routeIs('shift.*')
                         ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                         : 'text-sidebar-text hover:text-sidebar-hover' }}">
@@ -187,10 +222,9 @@
                         <span class="ml-3">Shift</span>
                     </a>
 
-
                     {{-- Laporan --}}
                     <a href="{{ route('laporan.index') }}"
-                        class="flex items-center px-4 py-3 rounded-sm
+                        class="sidebar-link flex items-center px-4 py-3 rounded-sm
                        {{ request()->routeIs('laporan.index')
                            ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                            : 'text-sidebar-text hover:text-sidebar-hover' }}">
@@ -204,13 +238,8 @@
                         <i class="fas fa-sign-out-alt w-5"></i>
                         <span class="ml-3">Keluar</span>
                     </button>
-
                 </nav>
-
             </div>
-
-
-
         </aside>
 
         <!-- Main Content -->
@@ -276,15 +305,69 @@
     </div>
 
     <script>
-        // Sidebar Toggle
+        // Sidebar Toggle dan Close Functionality
         const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebarClose = document.getElementById('sidebar-close');
         const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const sidebarLinks = document.querySelectorAll('.sidebar-link');
 
+        // Fungsi untuk membuka sidebar
+        function openSidebar() {
+            sidebar.classList.add('open');
+            sidebarOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+
+        // Fungsi untuk menutup sidebar
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        // Event listener untuk tombol toggle
         sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
+            if (sidebar.classList.contains('open')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        });
+
+        // Event listener untuk tombol close
+        if (sidebarClose) {
+            sidebarClose.addEventListener('click', closeSidebar);
+        }
+
+        // Event listener untuk overlay (klik di luar sidebar untuk menutup)
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Event listener untuk link sidebar (menutup sidebar saat link diklik di mobile)
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                // Hanya tutup sidebar di mobile
+                if (window.innerWidth < 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // Event listener untuk resize window
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                // Jika layar desktop, tutup sidebar mobile dan restore scrolling
+                closeSidebar();
+            }
+        });
+
+        // Prevent body scroll when sidebar is open on mobile
+        sidebar.addEventListener('transitionend', () => {
+            if (!sidebar.classList.contains('open')) {
+                document.body.style.overflow = '';
+            }
         });
     </script>
-
 
     @stack('modals')
 

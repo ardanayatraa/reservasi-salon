@@ -29,7 +29,7 @@ Route::get('/', [BookingController::class, 'index'])
      ->name('landing-page');
 Route::post('/book-service', [BookingController::class, 'bookService'])
      ->name('book.service');
-Route::get('/check-availability', [BookingController::class, 'checkAvailability'])
+Route::post('/check-availability', [BookingController::class, 'checkAvailability'])
     ->name('check.availability');
 
 Route::get('/payment/finish', [BookingController::class, 'finish'])->name('payment.finish');

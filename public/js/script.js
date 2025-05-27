@@ -1,25 +1,123 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Mobile Menu Toggle
+  // Enhanced Mobile Menu Toggle
   const menuToggle = document.getElementById("menu-toggle")
   const mobileMenu = document.getElementById("mobile-menu")
 
   if (menuToggle && mobileMenu) {
+    // Toggle mobile menu with icon change
     menuToggle.addEventListener("click", () => {
       mobileMenu.classList.toggle("hidden")
+
+      // Change hamburger icon to X when open
+      const icon = menuToggle.querySelector('i')
+      if (!mobileMenu.classList.contains("hidden")) {
+        icon.classList.remove('fa-bars')
+        icon.classList.add('fa-times')
+      } else {
+        icon.classList.remove('fa-times')
+        icon.classList.add('fa-bars')
+      }
+    })
+
+    // Close mobile menu when clicking on navigation links
+    const mobileNavLinks = mobileMenu.querySelectorAll('a[href^="#"]')
+    mobileNavLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault()
+
+        // Close mobile menu
+        mobileMenu.classList.add("hidden")
+        const icon = menuToggle.querySelector('i')
+        icon.classList.remove('fa-times')
+        icon.classList.add('fa-bars')
+
+        // Smooth scroll to target
+        const targetId = this.getAttribute('href')
+        const targetSection = document.querySelector(targetId)
+
+        if (targetSection) {
+          const offsetTop = targetSection.offsetTop - 80 // Account for fixed navbar
+          window.scrollTo({
+            top: offsetTop,
+            behavior: 'smooth'
+          })
+        }
+      })
+    })
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!menuToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+        if (!mobileMenu.classList.contains("hidden")) {
+          mobileMenu.classList.add("hidden")
+          const icon = menuToggle.querySelector('i')
+          icon.classList.remove('fa-times')
+          icon.classList.add('fa-bars')
+        }
+      }
+    })
+
+    // Close mobile menu on window resize to desktop
+    window.addEventListener('resize', function() {
+      if (window.innerWidth >= 768) {
+        mobileMenu.classList.add("hidden")
+        const icon = menuToggle.querySelector('i')
+        icon.classList.remove('fa-times')
+        icon.classList.add('fa-bars')
+      }
     })
   }
 
-  // Back to Top Button
-  window.addEventListener("scroll", () => {
-    var backToTopButton = document.querySelector('a[href="#home"]')
-    if (document.documentElement.scrollTop > 300) {
-      backToTopButton.classList.remove("hidden")
-    } else {
-      backToTopButton.classList.add("hidden")
-    }
+  // Enhanced smooth scroll for all navigation links (desktop and mobile)
+  const allNavLinks = document.querySelectorAll('a[href^="#"]')
+  allNavLinks.forEach(link => {
+    // Skip if it's already handled by mobile menu logic above
+    if (mobileMenu && mobileMenu.contains(link)) return
+
+    link.addEventListener('click', function(e) {
+      e.preventDefault()
+      const targetId = this.getAttribute('href')
+      const targetSection = document.querySelector(targetId)
+
+      if (targetSection) {
+        const offsetTop = targetSection.offsetTop - 80 // Account for fixed navbar
+        window.scrollTo({
+          top: offsetTop,
+          behavior: 'smooth'
+        })
+      }
+    })
   })
 
-  // Booking Modal
+  // Enhanced Back to Top Button
+  const backToTopButton = document.querySelector('a[href="#home"]')
+  if (backToTopButton) {
+    // Initially hide the button
+    backToTopButton.style.opacity = '0'
+    backToTopButton.style.visibility = 'hidden'
+    backToTopButton.style.transition = 'opacity 0.3s ease, visibility 0.3s ease'
+
+    window.addEventListener("scroll", () => {
+      if (document.documentElement.scrollTop > 300) {
+        backToTopButton.style.opacity = '1'
+        backToTopButton.style.visibility = 'visible'
+      } else {
+        backToTopButton.style.opacity = '0'
+        backToTopButton.style.visibility = 'hidden'
+      }
+    })
+
+    // Smooth scroll to top
+    backToTopButton.addEventListener('click', function(e) {
+      e.preventDefault()
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      })
+    })
+  }
+
+  // Enhanced Responsive Booking Modal
   const modal = document.getElementById("booking-modal")
   const bookButtons = document.querySelectorAll(".book-service-btn")
   const closeBtn = document.querySelector(".modal-close")
@@ -28,6 +126,113 @@ document.addEventListener("DOMContentLoaded", () => {
   const stepContents = document.querySelectorAll(".step-content")
   const bookingForm = document.getElementById("booking-form")
   const selectedServicesContainer = document.getElementById("selected-services-container")
+
+  // Make modal responsive
+  function makeModalResponsive() {
+    if (modal) {
+      const modalContent = modal.querySelector('.modal-content')
+      if (modalContent) {
+        if (window.innerWidth < 768) {
+          // Mobile styles
+          modalContent.style.margin = '1rem'
+          modalContent.style.maxWidth = 'calc(100vw - 2rem)'
+          modalContent.style.width = 'calc(100vw - 2rem)'
+          modalContent.style.maxHeight = 'calc(100vh - 2rem)'
+          modalContent.style.overflow = 'auto'
+
+          // Adjust stepper for mobile
+          const stepper = modalContent.querySelector('.stepper')
+          if (stepper) {
+            stepper.style.marginBottom = '1rem'
+          }
+
+          // Adjust step labels for mobile
+          const stepLabels = modalContent.querySelector('.flex.justify-between.text-sm')
+          if (stepLabels) {
+            stepLabels.style.fontSize = '0.75rem'
+            stepLabels.style.marginBottom = '1rem'
+          }
+
+          // Adjust padding for mobile
+          const modalPadding = modalContent.querySelector('.p-6')
+          if (modalPadding) {
+            modalPadding.classList.remove('p-6')
+            modalPadding.classList.add('p-4')
+          }
+
+          // Make time slots grid responsive
+          const timeSlotGrids = modalContent.querySelectorAll('.grid.grid-cols-5')
+          timeSlotGrids.forEach(grid => {
+            grid.classList.remove('grid-cols-5')
+            grid.classList.add('grid-cols-3')
+          })
+
+          // Adjust service selection for mobile
+          const serviceRows = modalContent.querySelectorAll('.service-row')
+          serviceRows.forEach(row => {
+            row.classList.remove('flex', 'items-center', 'space-x-2')
+            row.classList.add('flex', 'flex-col', 'space-y-2')
+
+            const select = row.querySelector('select')
+            const button = row.querySelector('button')
+            if (select) select.style.width = '100%'
+            if (button) button.style.width = '100%'
+          })
+
+        } else {
+          // Desktop styles (reset)
+          modalContent.style.margin = '2rem auto'
+          modalContent.style.maxWidth = '800px'
+          modalContent.style.width = ''
+          modalContent.style.maxHeight = ''
+          modalContent.style.overflow = ''
+
+          // Reset stepper
+          const stepper = modalContent.querySelector('.stepper')
+          if (stepper) {
+            stepper.style.marginBottom = '2rem'
+          }
+
+          // Reset step labels
+          const stepLabels = modalContent.querySelector('.flex.justify-between.text-sm')
+          if (stepLabels) {
+            stepLabels.style.fontSize = ''
+            stepLabels.style.marginBottom = '2rem'
+          }
+
+          // Reset padding
+          const modalPadding = modalContent.querySelector('.p-4')
+          if (modalPadding) {
+            modalPadding.classList.remove('p-4')
+            modalPadding.classList.add('p-6')
+          }
+
+          // Reset time slots grid
+          const timeSlotGrids = modalContent.querySelectorAll('.grid.grid-cols-3')
+          timeSlotGrids.forEach(grid => {
+            grid.classList.remove('grid-cols-3')
+            grid.classList.add('grid-cols-5')
+          })
+
+          // Reset service selection
+          const serviceRows = modalContent.querySelectorAll('.service-row')
+          serviceRows.forEach(row => {
+            row.classList.remove('flex', 'flex-col', 'space-y-2')
+            row.classList.add('flex', 'items-center', 'space-x-2')
+
+            const select = row.querySelector('select')
+            const button = row.querySelector('button')
+            if (select) select.style.width = ''
+            if (button) button.style.width = ''
+          })
+        }
+      }
+    }
+  }
+
+  // Apply responsive modal on load and resize
+  makeModalResponsive()
+  window.addEventListener('resize', makeModalResponsive)
 
   // Service Data
   let bookingData = {
@@ -38,9 +243,10 @@ document.addEventListener("DOMContentLoaded", () => {
     totalDuration: 0,
   }
 
-  // Function untuk cek ketersediaan real-time
+  // Function untuk cek ketersediaan real-time dengan fallback
   async function checkTimeSlotAvailability(date, time, totalDuration) {
     try {
+      // Cek apakah route tersedia
       const response = await fetch("/check-availability", {
         method: "POST",
         headers: {
@@ -54,6 +260,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }),
       })
 
+      if (response.status === 405) {
+        // Route tidak tersedia, gunakan fallback
+        console.warn("Availability check route not available, using fallback")
+        return {
+          available: true,
+          employees: [{ name: "Auto-assigned" }],
+          slots_available: 1,
+          message: "Availability check not available, assuming slot is available"
+        }
+      }
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -61,8 +278,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json()
       return data
     } catch (error) {
-      console.error("Error checking availability:", error)
-      return { available: false, employees: [], slots_available: 0 }
+      console.warn("Error checking availability, using fallback:", error)
+
+      // Fallback: assume slot is available
+      return {
+        available: true,
+        employees: [{ name: "Auto-assigned" }],
+        slots_available: 1,
+        message: "Unable to check availability, assuming slot is available"
+      }
     }
   }
 
@@ -85,6 +309,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Function to go to step
   function goToStep(stepNumber) {
     setActiveStep(stepNumber - 1)
+    // Scroll to top of modal on mobile
+    if (window.innerWidth < 768 && modal) {
+      const modalContent = modal.querySelector('.modal-content')
+      if (modalContent) {
+        modalContent.scrollTop = 0
+      }
+    }
   }
 
   // Event listeners for booking buttons
@@ -131,14 +362,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const serviceElement = document.createElement("div")
       serviceElement.className = "selected-service"
       serviceElement.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <div>
+                <div class="flex justify-between items-center ${window.innerWidth < 768 ? 'flex-col space-y-2' : ''}">
+                    <div class="${window.innerWidth < 768 ? 'text-center' : ''}">
                         <span class="font-medium">${service.name}</span>
                         <span class="text-sm text-gray-500 ml-2">(${service.duration} menit)</span>
                     </div>
-                    <div class="flex items-center">
+                    <div class="flex items-center ${window.innerWidth < 768 ? 'justify-center space-x-4' : ''}">
                         <span class="text-primary mr-4">Rp ${Number.parseInt(service.price).toLocaleString("id-ID")}</span>
-                        <button type="button" class="remove-selected-service text-red-500 text-xl leading-none"
+                        <button type="button" class="remove-selected-service text-red-500 text-xl leading-none hover:bg-red-100 rounded-full w-6 h-6 flex items-center justify-center"
                             data-index="${index}" title="Hapus">&times;</button>
                     </div>
                 </div>
@@ -185,6 +416,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (modal) {
       modal.style.display = "block"
       document.body.style.overflow = "hidden" // Prevent scrolling
+      makeModalResponsive() // Apply responsive styles
     }
   }
 
@@ -325,9 +557,10 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 
     container.appendChild(row)
+    makeModalResponsive() // Reapply responsive styles
   })
 
-  // Time slot selection dengan availability checking
+  // Time slot selection dengan availability checking dan fallback
   window.selectSlot = async (shiftId, time) => {
     // Clear previous selections
     document
@@ -349,7 +582,7 @@ document.addEventListener("DOMContentLoaded", () => {
     selectedSlot.style.pointerEvents = "none"
 
     try {
-      // Cek ketersediaan
+      // Cek ketersediaan dengan fallback
       const availability = await checkTimeSlotAvailability(bookingData.date, time, bookingData.totalDuration)
 
       // Reset slot display
@@ -374,6 +607,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (availability.employees && availability.employees.length > 0) {
           const employeeInfo = document.getElementById("employee-info")
           if (employeeInfo) {
+            const warningMessage = availability.message ? `<div class="text-xs text-yellow-600 mt-1">${availability.message}</div>` : ''
             employeeInfo.innerHTML = `
                         <div class="text-sm text-green-600 mt-2 p-3 bg-green-50 rounded-md">
                             <i class="fas fa-check-circle"></i>
@@ -381,6 +615,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div class="text-xs mt-1">
                                 Karyawan: ${availability.employees.map((emp) => emp.name).join(", ")}
                             </div>
+                            ${warningMessage}
                         </div>
                     `
           }
@@ -411,8 +646,28 @@ document.addEventListener("DOMContentLoaded", () => {
       selectedSlot.style.pointerEvents = "auto"
       selectedSlot.classList.remove("checking")
 
-      console.error("Error checking availability:", error)
-      alert("Terjadi kesalahan saat mengecek ketersediaan. Silakan coba lagi.")
+      console.error("Error in slot selection:", error)
+
+      // Fallback: allow selection anyway
+      selectedSlot.classList.add("selected")
+      bookingData.time = time
+      document.getElementById("selected-time").value = time
+
+      const startTime = parseHM(time)
+      const endTime = startTime + bookingData.totalDuration
+      document.getElementById("displayEnd").textContent = formatHM(endTime)
+
+      const employeeInfo = document.getElementById("employee-info")
+      if (employeeInfo) {
+        employeeInfo.innerHTML = `
+          <div class="text-sm text-yellow-600 mt-2 p-3 bg-yellow-50 rounded-md">
+              <i class="fas fa-exclamation-triangle"></i>
+              Tidak dapat mengecek ketersediaan karyawan. Slot dipilih dengan asumsi tersedia.
+          </div>
+        `
+      }
+
+      document.getElementById("next-to-step-2").disabled = false
     }
   }
 
