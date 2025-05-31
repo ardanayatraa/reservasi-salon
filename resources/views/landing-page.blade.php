@@ -18,7 +18,7 @@
 
     <script>
         // Global data untuk JavaScript
-        window.isLoggedIn = @json(auth()->guard('pelanggan')->check());
+        window.isLoggedIn = @json(auth()->check());
         window.userData = @json($user ?? null);
         window.servicesData = @json($services ?? []);
         window.shiftsData = @json($shifts ?? []);
@@ -483,7 +483,8 @@
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    @guest('pelanggan')
+                    {{-- Pelanggan menggunakan auth() default --}}
+                    @guest
                         <a href="/login"
                             class="hidden md:block px-4 lg:px-6 py-2 btn-outline rounded-sm font-light text-sm">
                             MASUK
@@ -497,6 +498,7 @@
                         </form>
                     @endguest
 
+                    {{-- Admin menggunakan guard 'admin' --}}
                     @auth('admin')
                         <a href="/dashboard"
                             class="hidden md:block px-4 lg:px-6 py-2 btn-outline rounded-sm font-light text-sm">
@@ -508,6 +510,7 @@
                         <i class="fas fa-bars text-xl"></i>
                     </button>
                 </div>
+
             </div>
 
             <!-- Mobile Menu -->

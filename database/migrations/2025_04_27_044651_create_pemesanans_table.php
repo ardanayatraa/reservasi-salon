@@ -22,9 +22,7 @@ class CreatePemesanansTable extends Migration
             $table->string('status_pembayaran');
             $table->string('token')->nullable();
             $table->timestamps();
-    $table->unsignedBigInteger('id_karyawan')->nullable();
-            $table->foreign('id_user')
-    ;
+             $table->unsignedBigInteger('id_karyawan')->nullable();
             $table->foreign('id_pelanggan')
                   ->references('id_pelanggan')->on('pelanggans')
                   ->onDelete('cascade');

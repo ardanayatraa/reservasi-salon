@@ -54,7 +54,7 @@ class BookingController extends Controller
             }
 
             // 4. User pelanggan (jika sudah login)
-            $user = Auth::guard('pelanggan')->user();
+            $user = Auth::user();
 
             // 5. Riwayat berdasarkan query email
             $email     = $request->query('email');
@@ -230,7 +230,7 @@ class BookingController extends Controller
      */
     public function bookService(Request $request)
     {
-        $user = Auth::guard('pelanggan')->user();
+        $user = Auth::user();
 
         // 1) Validasi
         $request->validate([
