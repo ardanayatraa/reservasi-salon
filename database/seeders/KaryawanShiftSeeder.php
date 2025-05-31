@@ -26,7 +26,7 @@ class KaryawanShiftSeeder extends Seeder
 
         // 2. Data 9 karyawan (5 di shift pagi, 4 di shift siang)
         $karyawans = [
-            ['nama_lengkap'=>'Sistri','username'=>'sistri','email'=>'sistri@example.com','no_telepon'=>'081234567890','alamat'=>'Jl. Melati No.1','shift'=>$shiftPagi],
+            ['nama_lengkap'=>'Sistri','email'=>'sistri@example.com','no_telepon'=>'081234567890','alamat'=>'Jl. Melati No.1','shift'=>$shiftPagi],
 
         ];
 
