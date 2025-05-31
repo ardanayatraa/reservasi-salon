@@ -58,8 +58,8 @@ class ShiftController extends Controller
 
         $v = $request->validate([
             'nama_shift' => 'required|string|max:100',
-            'start_time' => 'required|date_format:H:i:s',
-            'end_time'   => 'required|date_format:H:i:s',
+            'start_time' => 'required',
+            'end_time'   => 'required',
         ]);
 
         $shift->update($v);
