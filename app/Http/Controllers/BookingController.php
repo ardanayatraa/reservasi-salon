@@ -316,7 +316,7 @@ class BookingController extends Controller
         // 10) Generate Snap Token
         $params = [
             'transaction_details' => [
-                'order_id' => $pembayaran->id_pembayaran,
+                'order_id' =>$pembayaran->id_pembayaran . '-' . time(),
                 'gross_amount' => $totalPrice,
             ],
             'customer_details' => [
