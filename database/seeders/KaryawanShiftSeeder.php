@@ -33,8 +33,6 @@ class KaryawanShiftSeeder extends Seeder
         foreach ($karyawans as $data) {
             Karyawan::create([
                 'nama_lengkap' => $data['nama_lengkap'],
-                'username'     => $data['username'],
-                'password'     => Hash::make('password123'),  // ganti default password jika perlu
                 'email'        => $data['email'],
                 'no_telepon'   => $data['no_telepon'],
                 'alamat'       => $data['alamat'],
