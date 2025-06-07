@@ -32,8 +32,7 @@ class KaryawanTable extends LivewireDatatable
                 ->label('No. Telepon'),
 
             Column::name('shift.nama_shift')
-                ->label('Shift')
-                ->searchable(),
+                ->label('Shift'),
 
             Column::callback(['id_karyawan'], function ($id) {
                 return view('components.actions', [
