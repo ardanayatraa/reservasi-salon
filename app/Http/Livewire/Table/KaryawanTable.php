@@ -8,10 +8,13 @@ use Mediconesystems\LivewireDatatables\Column;
 
 class KaryawanTable extends LivewireDatatable
 {
-    public function builder()
-    {
-        return KaryawanModel::with('shift');
-    }
+        public function builder()
+        {
+            return KaryawanModel::query()
+                ->leftJoin('shifts', 'shifts.id_shift', '=', 'karyawans.id_shift')
+                ->select('karyawans.*', 'shifts.nama_shift as shift_nama_shift');
+        }
+
 
     public function columns()
     {
@@ -32,7 +35,8 @@ class KaryawanTable extends LivewireDatatable
                 ->label('No. Telepon'),
 
             Column::name('shift.nama_shift')
-                ->label('Shift'),
+                ->label('Shift')
+                ->searchable(),
 
             Column::callback(['id_karyawan'], function ($id) {
                 return view('components.actions', [
