@@ -1086,7 +1086,7 @@
                         </li>
                         <li class="flex items-start">
                             <i class="fas fa-clock text-primary mt-1 mr-3"></i>
-                            <span class="text-gray-400 text-sm">Buka setiap hari:9:00 AM - 7:00 PM</span>
+                            <span class="text-gray-400 text-sm">Buka setiap hari: 9:00 AM - 7:00 PM</span>
                         </li>
                     </ul>
                 </div>
