@@ -979,7 +979,7 @@
                                 </div>
                                 <div>
                                     <h4 class="font-serif font-bold text-dark mb-2">Jam Buka</h4>
-                                    <p class="text-gray-600 text-sm">Buka setiap hari: 9:00 - 21:00</p>
+                                    <p class="text-gray-600 text-sm">Buka setiap hari: 9:00 AM - 7:00 PM</p>
                                 </div>
                             </div>
                         </div>
