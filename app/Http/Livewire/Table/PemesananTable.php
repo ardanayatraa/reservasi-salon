@@ -23,6 +23,9 @@ class PemesananTable extends LivewireDatatable
             Column::name('pelanggan.nama_lengkap')
                 ->label('Pelanggan')
                 ->searchable(),
+            Column::name('karyawan.nama_lengkap')
+                ->label('Karyawan')
+                ->searchable(),
 
             Column::name('tanggal_pemesanan')
                 ->label('Tanggal')
