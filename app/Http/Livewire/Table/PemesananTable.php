@@ -30,6 +30,9 @@ class PemesananTable extends LivewireDatatable
             Column::name('tanggal_pemesanan')
                 ->label('Tanggal')
                 ->searchable(),
+            Column::name('waktu')
+                ->label('Waktu')
+                ->searchable(),
 
             Column::name('status_pemesanan')
                 ->label('Status'),
