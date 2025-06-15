@@ -487,13 +487,13 @@
                     @guest
                         <a href="/login"
                             class="hidden md:block px-4 lg:px-6 py-2 btn-outline rounded-sm font-light text-sm">
-                            MASUK
+                            LOGIN
                         </a>
                     @else
                         <form action="/logout" method="POST" class="hidden md:block">
                             @csrf
                             <button type="submit" class="px-4 lg:px-6 py-2 btn-outline rounded-sm font-light text-sm">
-                                KELUAR
+                                LOGOUT
                             </button>
                         </form>
                     @endguest
@@ -524,14 +524,14 @@
                     @guest('pelanggan')
                         <a href="/login"
                             class="block w-full text-center px-6 py-2 border border-primary rounded-sm font-light text-sm hover:bg-primary hover:text-white transition">
-                            MASUK
+                            LOGIN
                         </a>
                     @else
                         <form action="/logout" method="POST" class="w-full">
                             @csrf
                             <button type="submit"
                                 class="block w-full text-center px-6 py-2 border border-primary rounded-sm font-light text-sm hover:bg-primary hover:text-white transition">
-                                KELUAR
+                                LOGOUT
                             </button>
                         </form>
                     @endguest
