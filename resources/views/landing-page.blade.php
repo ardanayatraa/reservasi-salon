@@ -484,7 +484,7 @@
 
                 <div class="flex items-center space-x-4">
                     {{-- Pelanggan menggunakan auth() default --}}
-                    @guest
+                    @if (!auth()->guard('admin')->user())
                         <a href="/login"
                             class="hidden md:block px-4 lg:px-6 py-2 btn-outline rounded-sm font-light text-sm">
                             LOGIN
@@ -496,15 +496,15 @@
                                 LOGOUT
                             </button>
                         </form>
-                    @endguest
+                    @endif
 
                     {{-- Admin menggunakan guard 'admin' --}}
-                    @auth('admin')
+                    @if (auth()->guard('admin')->user())
                         <a href="/dashboard"
                             class="hidden md:block px-4 lg:px-6 py-2 btn-outline rounded-sm font-light text-sm">
                             DASHBOARD ADMIN
                         </a>
-                    @endauth
+                    @endif
 
                     <button id="menu-toggle" class="md:hidden text-dark focus:outline-none">
                         <i class="fas fa-bars text-xl"></i>
