@@ -25,7 +25,7 @@ Route::post('/login', [CustomAuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])->name('logout');
 
 // Admin Area
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['role:admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Admin Routes
