@@ -484,7 +484,7 @@
 
                 <div class="flex items-center space-x-4">
                     {{-- Pelanggan menggunakan auth() default --}}
-                    @if (!auth('admin')->check() && !auth('pelanggan')->check())
+                    @if (!auth('admin')->check() && !auth()->check())
                         {{-- Tampilkan tombol login --}}
                         <a href="/login"
                             class="hidden md:block px-4 lg:px-6 py-2 btn-outline rounded-sm font-light text-sm">
