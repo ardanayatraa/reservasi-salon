@@ -499,6 +499,13 @@
                         </form>
                     @endif
 
+                    <form action="/logout" method="POST" class="hidden md:block">
+                        @csrf
+                        <button type="submit" class="px-4 lg:px-6 py-2 btn-outline rounded-sm font-light text-sm">
+                            LOGOUT
+                        </button>
+                    </form>
+
 
                     {{-- Admin menggunakan guard 'admin' --}}
                     @if (auth()->guard('admin')->user())
