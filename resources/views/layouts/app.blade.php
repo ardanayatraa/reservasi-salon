@@ -152,6 +152,39 @@
                         <span class="ml-3">Admin</span>
                     </a>
 
+
+                    {{-- Karyawan --}}
+                    <a href="{{ route('karyawan.index') }}"
+                        class="sidebar-link flex items-center px-4 py-3 rounded-sm
+                    {{ request()->routeIs('karyawan.*')
+                        ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
+                        : 'text-sidebar-text hover:text-sidebar-hover' }}">
+                        <i class="fas fa-user w-5"></i>
+                        <span class="ml-3">Karyawan</span>
+                    </a>
+
+
+                    {{-- Shift --}}
+                    <a href="{{ route('shift.index') }}"
+                        class="sidebar-link flex items-center px-4 py-3 rounded-sm
+                    {{ request()->routeIs('shift.*')
+                        ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
+                        : 'text-sidebar-text hover:text-sidebar-hover' }}">
+                        <i class="fas fa-clock w-5"></i>
+                        <span class="ml-3">Shift</span>
+                    </a>
+
+                    {{-- Perawatan --}}
+                    <a href="{{ route('perawatan.index') }}"
+                        class="sidebar-link flex items-center px-4 py-3 rounded-sm
+                       {{ request()->routeIs('perawatan.*')
+                           ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
+                           : 'text-sidebar-text hover:text-sidebar-hover' }}">
+                        <i class="fas fa-spa w-5"></i>
+                        <span class="ml-3">Perawatan</span>
+                    </a>
+
+
                     {{-- Booked --}}
                     <a href="{{ route('booked.index') }}"
                         class="sidebar-link flex items-center px-4 py-3 rounded-sm
@@ -172,16 +205,6 @@
                         <span class="ml-3">Pelanggan</span>
                     </a>
 
-                    {{-- Pembayaran --}}
-                    <a href="{{ route('pembayaran.index') }}"
-                        class="sidebar-link flex items-center px-4 py-3 rounded-sm
-                       {{ request()->routeIs('pembayaran.*')
-                           ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
-                           : 'text-sidebar-text hover:text-sidebar-hover' }}">
-                        <i class="fas fa-credit-card w-5"></i>
-                        <span class="ml-3">Pembayaran</span>
-                    </a>
-
                     {{-- Pemesanan --}}
                     <a href="{{ route('pemesanan.index') }}"
                         class="sidebar-link flex items-center px-4 py-3 rounded-sm
@@ -192,35 +215,19 @@
                         <span class="ml-3">Pemesanan</span>
                     </a>
 
-                    {{-- Perawatan --}}
-                    <a href="{{ route('perawatan.index') }}"
+                    {{-- Pembayaran --}}
+                    <a href="{{ route('pembayaran.index') }}"
                         class="sidebar-link flex items-center px-4 py-3 rounded-sm
-                       {{ request()->routeIs('perawatan.*')
+                       {{ request()->routeIs('pembayaran.*')
                            ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                            : 'text-sidebar-text hover:text-sidebar-hover' }}">
-                        <i class="fas fa-spa w-5"></i>
-                        <span class="ml-3">Perawatan</span>
+                        <i class="fas fa-credit-card w-5"></i>
+                        <span class="ml-3">Pembayaran</span>
                     </a>
 
-                    {{-- Karyawan --}}
-                    <a href="{{ route('karyawan.index') }}"
-                        class="sidebar-link flex items-center px-4 py-3 rounded-sm
-                    {{ request()->routeIs('karyawan.*')
-                        ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
-                        : 'text-sidebar-text hover:text-sidebar-hover' }}">
-                        <i class="fas fa-user w-5"></i>
-                        <span class="ml-3">Karyawan</span>
-                    </a>
 
-                    {{-- Shift --}}
-                    <a href="{{ route('shift.index') }}"
-                        class="sidebar-link flex items-center px-4 py-3 rounded-sm
-                    {{ request()->routeIs('shift.*')
-                        ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
-                        : 'text-sidebar-text hover:text-sidebar-hover' }}">
-                        <i class="fas fa-clock w-5"></i>
-                        <span class="ml-3">Shift</span>
-                    </a>
+
+
 
                     {{-- Laporan --}}
                     <a href="{{ route('laporan.index') }}"

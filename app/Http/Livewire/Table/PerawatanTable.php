@@ -16,6 +16,11 @@ class PerawatanTable extends LivewireDatatable
     public function columns()
     {
         return [
+
+            Column::callback(['foto'], function ($foto) {
+    return view('components.image', ['foto' => $foto]);
+        })->label('Foto')->unsortable(),
+
             Column::name('nama_perawatan')
                 ->label('Nama Perawatan')
                 ->searchable(),
