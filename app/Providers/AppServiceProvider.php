@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
 public function boot()
 {
-    if (env('APP_ONLINE') !== 'true') {
+    if (!config('app.online')) {
         abort(503, 'Website sedang tidak aktif. Hubungi penyedia layanan.');
     }
 }
