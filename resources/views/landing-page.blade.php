@@ -18,7 +18,7 @@
 
     <script>
         // Global data untuk JavaScript
-        window.isLoggedIn = @json(auth()->check());
+        window.isLoggedIn = @json(auth('pelanggan')->check());
         window.userData = @json($user ?? null);
         window.servicesData = @json($services ?? []);
         window.shiftsData = @json($shifts ?? []);
@@ -484,21 +484,31 @@
 
                 <div class="flex items-center space-x-4">
                     {{-- Pelanggan menggunakan auth() default --}}
-                    @if (!auth('admin')->check() && !auth()->check())
+                    @if (!auth('admin')->check() && !auth('pelanggan')->check())
                         {{-- Tampilkan tombol login --}}
                         <a href="/login"
                             class="hidden md:block px-4 lg:px-6 py-2 btn-outline rounded-sm font-light text-sm">
                             LOGIN
                         </a>
                     @else
-                        <form action="/logout" method="POST" class="hidden md:block">
-                            @csrf
-                            <button type="submit" class="px-4 lg:px-6 py-2 btn-outline rounded-sm font-light text-sm">
-                                LOGOUT
-                            </button>
-                        </form>
-                    @endif
+                        {{-- User sudah login, tampilkan dropdown atau navigasi --}}
+                        <div class="hidden md:flex items-center space-x-4">
+                            {{-- Link ke dashboard --}}
+                            <a href="{{ route('customer.dashboard') }}"
+                                class="px-4 lg:px-6 py-2 bg-blue-500 text-white rounded-sm font-light text-sm hover:bg-blue-600 transition">
+                                DASHBOARD
+                            </a>
 
+                            {{-- Form logout --}}
+                            <form action="/logout" method="POST" class="inline">
+                                @csrf
+                                <button type="submit"
+                                    class="px-4 lg:px-6 py-2 btn-outline rounded-sm font-light text-sm">
+                                    LOGOUT
+                                </button>
+                            </form>
+                        </div>
+                    @endif
 
 
 

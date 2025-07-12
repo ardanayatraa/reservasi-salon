@@ -27,4 +27,6 @@ Route::middleware(['auth:pelanggan'])->prefix('customer')->name('customer.')->gr
     Route::get('/profile', [CustomerDashboardController::class, 'profile'])->name('profile');
     Route::put('/profile', [CustomerDashboardController::class, 'updateProfile'])->name('profile.update');
     Route::put('/password', [CustomerDashboardController::class, 'updatePassword'])->name('password.update');
+
+
 });

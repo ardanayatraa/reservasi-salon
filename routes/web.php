@@ -126,4 +126,4 @@ Route::middleware(['auth:admin'])->group(function () {
 require __DIR__.'/customer-routes.php';
 
 // Public Reviews
-Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
+Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index')->middleware('auth:pelanggan');
