@@ -16,6 +16,7 @@ class Pembayaran extends Model
         'metode_pembayaran',
         'snap_token',
         'notifikasi',
+        'order_id',
     ];
 
         protected $casts = [

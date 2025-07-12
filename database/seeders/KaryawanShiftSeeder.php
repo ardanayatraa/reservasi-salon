@@ -24,10 +24,66 @@ class KaryawanShiftSeeder extends Seeder
             'end_time'   => '19:00:00',
         ]);
 
-        // 2. Data 9 karyawan (5 di shift pagi, 4 di shift siang)
+        // 2. Data karyawan sesuai JSON (5 di shift pagi, 3 di shift siang)
         $karyawans = [
-            ['nama_lengkap'=>'Sistri','email'=>'sistri@example.com','no_telepon'=>'081234567890','alamat'=>'Jl. Melati No.1','shift'=>$shiftPagi],
-
+            // Shift Pagi (id_shift: 1)
+            [
+                'nama_lengkap' => 'Dewa Ayu Putu Sari',
+                'email' => 'DewaAyu@gmail.com',
+                'no_telepon' => '081234567890',
+                'alamat' => 'Jl. Mas Ubud',
+                'shift' => $shiftPagi
+            ],
+            [
+                'nama_lengkap' => 'Ni Putu Melia Arista',
+                'email' => 'Arista@gmail.com',
+                'no_telepon' => '081888765234',
+                'alamat' => 'Jl. Mas Ubud',
+                'shift' => $shiftPagi
+            ],
+            [
+                'nama_lengkap' => 'Ni Putu Yuli Damayanti',
+                'email' => 'Yuli@gmail.com',
+                'no_telepon' => '081893456723',
+                'alamat' => 'Jl. Mas Ubud',
+                'shift' => $shiftPagi
+            ],
+            [
+                'nama_lengkap' => 'Ni Komang Bintan',
+                'email' => 'Bintan@gmail.com',
+                'no_telepon' => '081987776511',
+                'alamat' => 'Jl. Mas Ubud',
+                'shift' => $shiftPagi
+            ],
+            [
+                'nama_lengkap' => 'Ni Wayan Budi Martini',
+                'email' => 'Budi@gmail.com',
+                'no_telepon' => '081543622190',
+                'alamat' => 'Jl. Mas Ubud',
+                'shift' => $shiftPagi
+            ],
+            // Shift Siang (id_shift: 2)
+            [
+                'nama_lengkap' => 'Ni Kadek Dwika Arthari',
+                'email' => 'Dwika@gmail.com',
+                'no_telepon' => '085113455440',
+                'alamat' => 'Jl. Mas Ubud',
+                'shift' => $shiftSiang
+            ],
+            [
+                'nama_lengkap' => 'Desak Made Indah Sari',
+                'email' => 'Indah@gmail.com',
+                'no_telepon' => '085123456987',
+                'alamat' => 'Jl. Mas Ubud',
+                'shift' => $shiftSiang
+            ],
+            [
+                'nama_lengkap' => 'Ni Made Hana Ari Lestari',
+                'email' => 'Hana@gmail.com',
+                'no_telepon' => '085678987651',
+                'alamat' => 'Jl. Mas Ubud',
+                'shift' => $shiftSiang
+            ],
         ];
 
         foreach ($karyawans as $data) {

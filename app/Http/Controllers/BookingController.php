@@ -377,7 +377,18 @@ class BookingController extends Controller
                 'status_pemesanan' => 'confirmed',
                 'status_pembayaran' => 'paid',
             ]);
-            $message = 'Pembayaran berhasil. Terima kasih!';
+          // Kirim email konfirmasi
+          $pemesanan = $pembayaran->pemesanan;
+    try {
+        \Mail::to($pemesanan->pelanggan->email)
+             ->send(new \App\Mail\BookingConfirmation($pemesanan));
+    } catch (\Exception $e) {
+        \Log::error('Failed to send booking confirmation email: ' . $e->getMessage());
+    }
+
+    $message = 'Pembayaran berhasil. Email konfirmasi telah dikirim!';
+
+
         } elseif ($status === 'pending') {
             $pembayaran->update([
                 'status_pembayaran' => 'pending',
@@ -391,6 +402,9 @@ class BookingController extends Controller
             ]);
             $message = 'Pembayaran gagal atau dibatalkan.';
         }
+
+
+
 
 
         return redirect('/')->with('status_message', $message);

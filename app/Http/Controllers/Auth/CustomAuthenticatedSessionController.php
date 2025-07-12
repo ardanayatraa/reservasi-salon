@@ -29,14 +29,14 @@ class CustomAuthenticatedSessionController extends FortifyController
             return $response;
         }
 
+
         // 3. Simpan role di session
         session(['role' => $role]);
 
         // 4. Redirect sesuai role
         $redirectTo = match ($role) {
             'admin'     => '/dashboard',
-            'pelanggan' => '/',
-            default     => '/',
+            'pelanggan' => '/customer/dashboard',
         };
 
         return redirect()->intended($redirectTo);

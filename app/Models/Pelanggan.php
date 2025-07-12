@@ -29,4 +29,9 @@ class Pelanggan extends Authenticatable
     {
         return $this->hasMany(Pemesanan::class, 'id_pelanggan', 'id_pelanggan');
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'id_pelanggan', 'id_pelanggan');
+    }
 }

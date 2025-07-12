@@ -13,6 +13,12 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\ShiftController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\CancelRefundController;
+use App\Http\Controllers\RescheduleController;
+use App\Http\Controllers\CustomerDashboardController;
+use App\Http\Controllers\AdminReviewController;
+use App\Http\Controllers\AdminRefundController;
 
 // Public Routes
 Route::get('/', [BookingController::class, 'index'])->name('landing-page');
@@ -21,11 +27,11 @@ Route::post('/check-availability', [BookingController::class, 'checkAvailability
 Route::get('/payment/finish', [BookingController::class, 'finish'])->name('payment.finish');
 
 // Auth Routes
-Route::post('/login', [CustomAuthenticatedSessionController::class, 'store']);
+Route::post('/login', [CustomAuthenticatedSessionController::class, 'store'])->name('login');
 Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-// Admin Area
-Route::middleware(['role:admin'])->group(function () {
+// Admin Area - Menggunakan guard admin
+Route::middleware(['auth:admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Admin Routes
@@ -37,7 +43,7 @@ Route::middleware(['role:admin'])->group(function () {
     Route::put('/admin/{admin}', [AdminController::class, 'update'])->name('admin.update');
     Route::delete('/admin/{admin}', [AdminController::class, 'destroy'])->name('admin.destroy');
 
-    // Pelanggan Routes
+    // Pelanggan Management Routes
     Route::get('/pelanggan', [PelangganController::class, 'index'])->name('pelanggan.index');
     Route::get('/pelanggan/create', [PelangganController::class, 'create'])->name('pelanggan.create');
     Route::post('/pelanggan', [PelangganController::class, 'store'])->name('pelanggan.store');
@@ -102,12 +108,22 @@ Route::middleware(['role:admin'])->group(function () {
     // Laporan
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/pdf', [LaporanController::class, 'exportPdf'])->name('laporan.pdf');
+
+    // Admin Review Management
+    Route::get('/admin/reviews', [AdminReviewController::class, 'index'])->name('admin.reviews.index');
+    Route::get('/admin/reviews/{review}', [AdminReviewController::class, 'show'])->name('admin.reviews.show');
+    Route::delete('/admin/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('admin.reviews.destroy');
+
+    // Admin Refund Management
+    Route::get('/admin/refunds', [AdminRefundController::class, 'index'])->name('admin.refunds.index');
+    Route::patch('/admin/refunds/{refund}/status', [AdminRefundController::class, 'updateStatus'])->name('admin.refunds.update-status');
+
+    // Admin Cancel/Refund
+    Route::post('/admin/pemesanan/{pemesanan}/cancel', [CancelRefundController::class, 'adminCancelBooking'])->name('admin.cancel.booking');
 });
 
-// Pelanggan Area (Dummy)
-Route::middleware(['auth', 'role:pelanggan'])->group(function () {
-    Route::get('/kk', fn () => 2)->name('home');
-    Route::get('/reservasi', fn () => 2)->name('reservasi.index');
-    Route::get('/reservasi/create', fn () => 2)->name('reservasi.create');
-    Route::post('/reservasi', fn () => 2)->name('reservasi.store');
-});
+// Include customer routes from separate file
+require __DIR__.'/customer-routes.php';
+
+// Public Reviews
+Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');

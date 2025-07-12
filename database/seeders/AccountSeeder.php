@@ -19,5 +19,14 @@ class AccountSeeder extends Seeder
             'no_telepon' => '081234567890',
             'alamat'     => 'Jl. Merdeka No.1, Jakarta',
         ]);
+
+        Pelanggan::create([
+    'nama_lengkap' => 'Budi Lempog',
+    'username'     => 'lempog',
+    'password'     => Hash::make('rahasia'),
+    'email'        => 'budi@example.com',
+    'no_telepon'   => '08123456789',
+    'alamat'       => 'Jl. Mawar No.10'
+]);
     }
 }

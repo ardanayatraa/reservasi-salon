@@ -10,7 +10,7 @@ class CreatePemesanansTable extends Migration
     {
         Schema::create('pemesanans', function (Blueprint $table) {
             $table->increments('id_pemesanan');
-            $table->unsignedInteger('id_user');        // Admin yang entry
+            $table->unsignedInteger('id_user')->nullable();        // Admin yang entry
             $table->unsignedInteger('id_pelanggan');
             $table->date('tanggal_pemesanan');
             $table->time('waktu');
