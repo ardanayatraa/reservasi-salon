@@ -32,7 +32,7 @@ class Review extends Model
     ];
 
     protected $attributes = [
-        'status' => 'approved', // Default status
+        // Removed default status to prevent overriding actual status
     ];
 
     /**

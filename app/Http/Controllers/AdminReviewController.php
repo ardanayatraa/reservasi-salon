@@ -13,6 +13,11 @@ class AdminReviewController extends Controller
     {
         $query = Review::with(['pelanggan', 'pemesanan.bookeds.perawatan']);
 
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
         // Filter by rating
         if ($request->filled('rating')) {
             $query->where('rating', $request->rating);
@@ -31,7 +36,7 @@ class AdminReviewController extends Controller
             $query->where(function($q) use ($search) {
                 $q->whereHas('pelanggan', function($subQ) use ($search) {
                     $subQ->where('nama_lengkap', 'like', "%{$search}%");
-                })->orWhere('review_text', 'like', "%{$search}%");
+                })->orWhere('komentar', 'like', "%{$search}%");
             });
         }
 
@@ -41,8 +46,12 @@ class AdminReviewController extends Controller
         // Statistics
         $stats = [
             'total_reviews' => Review::count(),
-            'average_rating' => round(Review::avg('rating'), 1),
-            'rating_distribution' => Review::select('rating', DB::raw('count(*) as count'))
+            'approved_reviews' => Review::where('status', 'approved')->count(),
+            'pending_reviews' => Review::where('status', 'pending')->count(),
+            'rejected_reviews' => Review::where('status', 'rejected')->count(),
+            'average_rating' => round(Review::where('status', 'approved')->avg('rating'), 1),
+            'rating_distribution' => Review::where('status', 'approved')
+                ->select('rating', DB::raw('count(*) as count'))
                 ->groupBy('rating')
                 ->orderBy('rating')
                 ->get()
@@ -57,6 +66,46 @@ class AdminReviewController extends Controller
     {
         $review->load(['pelanggan', 'pemesanan.bookeds.perawatan']);
         return view('admin.reviews.show', compact('review'));
+    }
+
+    public function updateStatus(Request $request, Review $review)
+    {
+        $request->validate([
+            'status' => 'required|in:approved,pending,rejected',
+            'admin_notes' => 'nullable|string|max:500'
+        ]);
+
+        $oldStatus = $review->status;
+        $newStatus = $request->status;
+
+        $review->update([
+            'status' => $newStatus,
+            'admin_notes' => $request->admin_notes
+        ]);
+
+        $statusMessages = [
+            'approved' => 'Review berhasil disetujui',
+            'pending' => 'Review berhasil diubah ke status pending',
+            'rejected' => 'Review berhasil ditolak'
+        ];
+
+        $message = $statusMessages[$newStatus];
+        
+        if ($request->admin_notes) {
+            $message .= ' dengan catatan admin';
+        }
+
+        // Check if request expects JSON response
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'review' => $review->fresh()
+            ]);
+        }
+
+        return redirect()->route('admin.reviews.index')
+            ->with('success', $message);
     }
 
     public function destroy(Review $review)

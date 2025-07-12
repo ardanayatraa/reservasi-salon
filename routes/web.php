@@ -15,7 +15,7 @@ use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\CancelRefundController;
-use App\Http\Controllers\RescheduleController;
+
 use App\Http\Controllers\CustomerDashboardController;
 use App\Http\Controllers\AdminReviewController;
 use App\Http\Controllers\AdminRefundController;
@@ -110,9 +110,10 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::get('/laporan/pdf', [LaporanController::class, 'exportPdf'])->name('laporan.pdf');
 
     // Admin Review Management
-    Route::get('/admin/reviews', [AdminReviewController::class, 'index'])->name('admin.reviews.index');
-    Route::get('/admin/reviews/{review}', [AdminReviewController::class, 'show'])->name('admin.reviews.show');
-    Route::delete('/admin/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('admin.reviews.destroy');
+    Route::get('/admin-reviews', [AdminReviewController::class, 'index'])->name('admin.reviews.index');
+    Route::get('/admin-reviews/{review}', [AdminReviewController::class, 'show'])->name('admin.reviews.show');
+    Route::patch('/admin-reviews/{review}/status', [AdminReviewController::class, 'updateStatus'])->name('admin.reviews.update-status');
+    Route::delete('/admin-reviews/{review}', [AdminReviewController::class, 'destroy'])->name('admin.reviews.destroy');
 
     // Admin Refund Management
     Route::get('/admin/refunds', [AdminRefundController::class, 'index'])->name('admin.refunds.index');
