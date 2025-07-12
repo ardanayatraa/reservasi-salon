@@ -283,6 +283,7 @@ class BookingController extends Controller
         foreach ($services as $svc) {
             Booked::create([
                 'id_pemesanan' => $pemesanan->id_pemesanan,
+                'id_karyawan' => $pemesanan->id_karyawan, // Assign karyawan yang sama
                 'id_perawatan' => $svc['id'],
                 'tanggal_booked' => $request->booking_date,
                 'waktu' => $startTime . ':00', // Tambah detik untuk konsistensi

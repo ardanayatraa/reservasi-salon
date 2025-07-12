@@ -149,7 +149,7 @@ public function updatePaymentStatus(Request $request)
                 'status_pemesanan' => 'confirmed',
                 'status_pembayaran' => 'paid'
             ]);
-
+            $this->sendBookingConfirmationEmail($pembayaran->pemesanan);
             $message = 'Pembayaran berhasil! Booking Anda telah dikonfirmasi.';
             $alertType = 'success';
 
@@ -260,6 +260,7 @@ public function updatePaymentStatus(Request $request)
                     'id_perawatan' => $svc['id'],
                     'tanggal_booked' => $request->booking_date,
                     'waktu' => $startTime . ':00',
+                         'id_karyawan' => $pemesanan->id_karyawan, // Assign karyawan yang sama
                 ]);
             }
 

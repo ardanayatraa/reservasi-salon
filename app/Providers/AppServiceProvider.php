@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Providers;
-
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,8 +21,10 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
-    {
-        //
+public function boot()
+{
+    if (env('APP_ONLINE') !== 'true') {
+        abort(503, 'Website sedang tidak aktif. Hubungi penyedia layanan.');
     }
+}
 }

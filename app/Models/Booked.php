@@ -13,6 +13,7 @@ class Booked extends Model
         'id_perawatan',
         'tanggal_booked',
         'waktu',
+        'id_karyawan',
     ];
 
     protected $casts = [

@@ -5,12 +5,27 @@ namespace App\Http\Livewire\Table;
 use App\Models\Pemesanan as PemesananModel;
 use Mediconesystems\LivewireDatatables\Http\Livewire\LivewireDatatable;
 use Mediconesystems\LivewireDatatables\Column;
+use Illuminate\Support\Facades\DB;
 
 class PemesananTable extends LivewireDatatable
 {
+    public $model = PemesananModel::class;
+    public $statuses = [
+        'pending' => 'Pending',
+        'confirmed' => 'Confirmed',
+        'in_progress' => 'In Progress',
+        'completed' => 'Completed',
+        'cancelled' => 'Cancelled',
+        'cancelled_by_salon' => 'Cancelled by Salon',
+        'no_show' => 'No Show',
+    ];
+
+    protected $listeners = ['changeStatus' => 'updateStatus'];
+
+
     public function builder()
     {
-        return PemesananModel::with(['pelanggan', 'perawatan']);
+        return PemesananModel::with(['pelanggan', 'karyawan']);
     }
 
     public function columns()
@@ -23,6 +38,7 @@ class PemesananTable extends LivewireDatatable
             Column::name('pelanggan.nama_lengkap')
                 ->label('Pelanggan')
                 ->searchable(),
+
             Column::name('karyawan.nama_lengkap')
                 ->label('Karyawan')
                 ->searchable(),
@@ -30,12 +46,18 @@ class PemesananTable extends LivewireDatatable
             Column::name('tanggal_pemesanan')
                 ->label('Tanggal')
                 ->searchable(),
+
             Column::name('waktu')
                 ->label('Waktu')
                 ->searchable(),
 
-            Column::name('status_pemesanan')
-                ->label('Status'),
+            Column::callback(['id_pemesanan', 'status_pemesanan'], function ($id, $status) {
+                return view('components.status-dropdown', [
+                    'id' => $id,
+                    'current' => $status,
+                    'statuses' => $this->statuses,
+                ]);
+            })->label('Status'),
 
             Column::callback(['id_pemesanan'], function ($id) {
                 return view('components.actions', [
@@ -44,5 +66,14 @@ class PemesananTable extends LivewireDatatable
                 ]);
             })->label('Aksi'),
         ];
+    }
+
+    public function updateStatus($id, $newStatus)
+    {
+        $pemesanan = PemesananModel::find($id);
+        if ($pemesanan) {
+            $pemesanan->status_pemesanan = $newStatus;
+            $pemesanan->save();
+        }
     }
 }
