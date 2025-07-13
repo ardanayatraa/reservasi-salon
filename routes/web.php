@@ -26,9 +26,9 @@ Route::post('/book-service', [BookingController::class, 'bookService'])->name('b
 Route::post('/check-availability', [BookingController::class, 'checkAvailability'])->name('check.availability');
 Route::get('/payment/finish', [BookingController::class, 'finish'])->name('payment.finish');
 
-// Auth Routes
-Route::post('/login', [CustomAuthenticatedSessionController::class, 'store'])->name('login');
-Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])->name('logout');
+// Auth Routes - Using Fortify for authentication
+// Route::post('/login', [CustomAuthenticatedSessionController::class, 'store'])->name('login');
+// Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])->name('logout');
 
 // Admin Area - Menggunakan guard admin
 Route::middleware(['auth:admin'])->group(function () {
@@ -128,3 +128,6 @@ require __DIR__.'/customer-routes.php';
 
 // Public Reviews
 Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index')->middleware('auth:pelanggan');
+
+// Load Fortify routes
+require __DIR__.'/../vendor/laravel/fortify/routes/routes.php';
