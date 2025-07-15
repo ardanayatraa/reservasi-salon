@@ -11,13 +11,8 @@ class PemesananTable extends LivewireDatatable
 {
     public $model = PemesananModel::class;
     public $statuses = [
-        'pending' => 'Pending',
         'confirmed' => 'Confirmed',
-        'in_progress' => 'In Progress',
         'completed' => 'Completed',
-        'cancelled' => 'Cancelled',
-        'cancelled_by_salon' => 'Cancelled by Salon',
-        'no_show' => 'No Show',
     ];
 
     protected $listeners = ['changeStatus' => 'updateStatus'];
