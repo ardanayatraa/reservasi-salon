@@ -15,14 +15,11 @@ class Perawatan extends Model
     protected $keyType = 'int';
 
     protected $fillable = [
-        'nama_perawatan',
+       'nama_perawatan',
+        'foto',
         'deskripsi',
+        'waktu',
         'harga',
-        'durasi',
-        'kategori',
-        'status',
-        'gambar',
-        'is_active'
     ];
 
     protected $casts = [
