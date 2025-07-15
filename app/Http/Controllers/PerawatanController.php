@@ -30,8 +30,7 @@ class PerawatanController extends Controller
         ]);
 
         if ($request->hasFile('foto')) {
-            $validated['foto'] = $request->file('foto')
-                                         ->store('perawatan', 'public');
+            $validated['foto'] = $request->file('foto')->store('perawatan', 'public');
         }
 
         Perawatan::create($validated);
@@ -60,15 +59,18 @@ class PerawatanController extends Controller
             'harga'          => 'required|numeric',
         ]);
 
+        // Jika ada file foto baru diupload
         if ($request->hasFile('foto')) {
-            // hapus file lama jika ada
-            if ($perawatan->foto) {
+            // Hapus file lama jika ada dan benar-benar eksis
+            if ($perawatan->foto && Storage::disk('public')->exists($perawatan->foto)) {
                 Storage::disk('public')->delete($perawatan->foto);
             }
-            $validated['foto'] = $request->file('foto')
-                                         ->store('perawatan', 'public');
+
+            // Simpan foto baru
+            $validated['foto'] = $request->file('foto')->store('perawatan', 'public');
         }
 
+        // Update data (hanya update 'foto' jika ada file baru)
         $perawatan->update($validated);
 
         return redirect()->route('perawatan.index')
@@ -77,9 +79,10 @@ class PerawatanController extends Controller
 
     public function destroy(Perawatan $perawatan)
     {
-        if ($perawatan->foto) {
+        if ($perawatan->foto && Storage::disk('public')->exists($perawatan->foto)) {
             Storage::disk('public')->delete($perawatan->foto);
         }
+
         $perawatan->delete();
 
         return redirect()->route('perawatan.index')
