@@ -39,46 +39,55 @@ class PerawatanController extends Controller
                          ->with('success', 'Perawatan berhasil ditambahkan');
     }
 
-    public function show(Perawatan $perawatan)
+    public function show($id)
     {
+        $perawatan = Perawatan::findOrFail($id);
         return view('perawatan.show', compact('perawatan'));
     }
 
-    public function edit(Perawatan $perawatan)
+    public function edit($id)
     {
+        $perawatan = Perawatan::findOrFail($id);
         return view('perawatan.edit', compact('perawatan'));
     }
 
-    public function update(Request $request, Perawatan $perawatan)
-    {
-        $validated = $request->validate([
-            'nama_perawatan' => 'required|string|max:255',
-            'foto'           => 'nullable|image|max:2048',
-            'deskripsi'      => 'nullable|string',
-            'waktu'          => 'required|string|max:50',
-            'harga'          => 'required|numeric',
-        ]);
+    public function update(Request $request, $id)
+{
+    $perawatan = Perawatan::findOrFail($id);
 
-        // Jika ada file foto baru diupload
-        if ($request->hasFile('foto')) {
-            // Hapus file lama jika ada dan benar-benar eksis
-            if ($perawatan->foto && Storage::disk('public')->exists($perawatan->foto)) {
-                Storage::disk('public')->delete($perawatan->foto);
-            }
+    // Update field non-foto langsung dari request
+    $perawatan->nama_perawatan = $request->nama_perawatan;
+    $perawatan->deskripsi = $request->deskripsi;
+    $perawatan->waktu = $request->waktu;
+    $perawatan->harga = $request->harga;
 
-            // Simpan foto baru
-            $validated['foto'] = $request->file('foto')->store('perawatan', 'public');
+    // Handle foto jika ada
+    if ($request->hasFile('foto')) {
+        // Simpan path foto lama
+        $fotoLama = $perawatan->foto;
+
+        // Upload foto baru
+        $fotoPath = $request->file('foto')->store('perawatan', 'public');
+        $perawatan->foto = $fotoPath;
+
+        // Hapus foto lama setelah berhasil upload
+        if ($fotoLama && Storage::disk('public')->exists($fotoLama)) {
+            Storage::disk('public')->delete($fotoLama);
         }
-
-        // Update data (hanya update 'foto' jika ada file baru)
-        $perawatan->update($validated);
-
-        return redirect()->route('perawatan.index')
-                         ->with('success', 'Perawatan berhasil diupdate');
     }
+    // Jika tidak ada file foto, field foto tidak diubah
 
-    public function destroy(Perawatan $perawatan)
+    // Simpan semua perubahan
+    $perawatan->save();
+
+    return redirect()->route('perawatan.index')
+                     ->with('success', 'Perawatan berhasil diupdate');
+}
+
+    public function destroy($id)
     {
+        $perawatan = Perawatan::findOrFail($id);
+
         if ($perawatan->foto && Storage::disk('public')->exists($perawatan->foto)) {
             Storage::disk('public')->delete($perawatan->foto);
         }
