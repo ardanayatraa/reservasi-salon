@@ -110,7 +110,7 @@
                                                 </p>
                                                 @if ($booking->karyawan)
                                                     <small class="text-muted">Terapis:
-                                                        {{ $booking->karyawan->nama_karyawan }}</small>
+                                                        {{ $booking->karyawan->nama_lengkap }}</small>
                                                 @endif
                                             </div>
                                             <div class="text-right">
