@@ -12,7 +12,9 @@ use App\Models\Shift;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class BookingController extends Controller
@@ -173,7 +175,7 @@ class BookingController extends Controller
         $existingBookings = Pemesanan::with('bookeds.perawatan')
                                    ->where('id_karyawan', $karyawanId)
                                    ->where('tanggal_pemesanan', $date)
-                                   ->whereIn('status_pemesanan', ['confirmed', 'pending'])
+                                   ->whereIn('status', ['confirmed', 'pending'])
                                    ->get();
 
         // Jika tidak ada booking sama sekali, berarti tidak ada konflik
@@ -243,92 +245,91 @@ class BookingController extends Controller
         $startTime = $request->booking_time;
         $endTime = Carbon::parse($startTime)->addMinutes($totalDuration)->format('H:i');
 
-        // 3) Cari karyawan yang tersedia
-        $availableEmployees = $this->findAvailableEmployees(
-            $request->booking_date,
-            $startTime,
-            $endTime
-        );
-
-        if (empty($availableEmployees)) {
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Tidak ada karyawan yang tersedia untuk waktu tersebut.'
-                ], 400);
-            }
-            return redirect()->back()->withErrors(['booking' => 'Tidak ada karyawan yang tersedia.']);
-        }
-
-        // 4) Pilih karyawan pertama yang tersedia (bisa dibuat lebih pintar)
-        $selectedEmployee = $availableEmployees[0];
-
-        // 5) Buat header pemesanan
-        $pemesanan = Pemesanan::create([
-            'id_user' => $user->id_pelanggan,
-            'id_pelanggan' => $user->id_pelanggan,
-            'id_karyawan' => $selectedEmployee['id'], // Assign karyawan
-            'tanggal_pemesanan' => $request->booking_date,
-            'waktu' => $startTime . ':00', // Tambah detik untuk konsistensi
-            'jumlah_perawatan' => count($services),
-            'total' => $totalPrice,
-            'sub_total' => $totalPrice,
-            'metode_pembayaran' => $request->payment_method,
-            'status_pemesanan' => 'pending',
-            'status_pembayaran' => 'unpaid',
-            'token' => '',
-        ]);
-
-        // 6) Buat detail bookeds
-        foreach ($services as $svc) {
-            Booked::create([
-                'id_pemesanan' => $pemesanan->id_pemesanan,
-                'id_karyawan' => $pemesanan->id_karyawan, // Assign karyawan yang sama
-                'id_perawatan' => $svc['id'],
-                'tanggal_booked' => $request->booking_date,
-                'waktu' => $startTime . ':00', // Tambah detik untuk konsistensi
-            ]);
-        }
-
-        // 7) Buat pembayaran
-        $pembayaran = Pembayaran::create([
-            'id_pemesanan' => $pemesanan->id_pemesanan,
-            'total_harga' => $totalPrice,
-            'metode_pembayaran' => $request->payment_method,
-            'status_pembayaran' => 'unpaid',
-            'snap_token' => '',
-            'notifikasi' => 'Menunggu pembayaran',
-        ]);
-
-        // 8) Siapkan item_details untuk Midtrans
-        $itemDetails = collect($services)->map(fn($s) => [
-            'id' => $s['id'],
-            'price' => $s['price'],
-            'quantity' => 1,
-            'name' => $s['name'],
-        ])->values()->all();
-
-        // 9) Konfigurasi Midtrans
-        \Midtrans\Config::$serverKey = config('midtrans.server_key');
-        \Midtrans\Config::$isProduction = config('midtrans.is_production');
-        \Midtrans\Config::$isSanitized = true;
-        \Midtrans\Config::$is3ds = true;
-
-        // 10) Generate Snap Token
-        $params = [
-            'transaction_details' => [
-                'order_id' =>$pembayaran->id_pembayaran . '-' . time(),
-                'gross_amount' => $totalPrice,
-            ],
-            'customer_details' => [
-                'first_name' => $user->nama_lengkap,
-                'email' => $user->email,
-                'phone' => $user->no_telepon,
-            ],
-            'item_details' => $itemDetails,
-        ];
-
         try {
+            $result = DB::transaction(function () use ($request, $user, $services, $totalPrice, $startTime, $endTime) {
+                // 3) Cari karyawan yang tersedia dengan lock
+                $availableEmployees = $this->findAvailableEmployees($request->booking_date, $startTime, $endTime);
+
+                if (empty($availableEmployees)) {
+                    throw new \Exception('Tidak ada karyawan yang tersedia untuk waktu tersebut.');
+                }
+
+                // 4) Pilih karyawan pertama yang tersedia
+                $selectedEmployee = $availableEmployees[0];
+
+                // 5) Buat header pemesanan
+                $pemesanan = Pemesanan::create([
+                    'id_user' => $user->id_pelanggan,
+                    'id_pelanggan' => $user->id_pelanggan,
+                    'id_karyawan' => $selectedEmployee['id'],
+                    'tanggal_pemesanan' => $request->booking_date,
+                    'waktu' => $startTime . ':00',
+                    'jumlah_perawatan' => count($services),
+                    'total' => $totalPrice,
+                    'sub_total' => $totalPrice,
+                    'metode_pembayaran' => $request->payment_method,
+                    'status' => 'pending',
+                    'status_pemesanan' => 'pending',
+                    'status_pembayaran' => 'unpaid',
+                    'payment_deadline' => Carbon::now()->addMinutes(30),
+                    'token' => '',
+                ]);
+
+                // 6) Buat detail bookeds
+                foreach ($services as $svc) {
+                    Booked::create([
+                        'id_pemesanan' => $pemesanan->id_pemesanan,
+                        'id_karyawan' => $pemesanan->id_karyawan,
+                        'id_perawatan' => $svc['id'],
+                        'tanggal_booked' => $request->booking_date,
+                        'waktu' => $startTime . ':00',
+                    ]);
+                }
+
+                // 7) Buat pembayaran
+                $pembayaran = Pembayaran::create([
+                    'id_pemesanan' => $pemesanan->id_pemesanan,
+                    'total_harga' => $totalPrice,
+                    'metode_pembayaran' => $request->payment_method,
+                    'status_pembayaran' => 'unpaid',
+                    'snap_token' => '',
+                    'notifikasi' => 'Menunggu pembayaran',
+                ]);
+
+                return ['pembayaran' => $pembayaran, 'selectedEmployee' => $selectedEmployee];
+            });
+
+            $pembayaran = $result['pembayaran'];
+            $selectedEmployee = $result['selectedEmployee'];
+
+            // 8) Siapkan item_details untuk Midtrans
+            $itemDetails = collect($services)->map(fn($s) => [
+                'id' => $s['id'],
+                'price' => $s['price'],
+                'quantity' => 1,
+                'name' => $s['name'],
+            ])->values()->all();
+
+            // 9) Konfigurasi Midtrans
+            \Midtrans\Config::$serverKey = config('midtrans.server_key');
+            \Midtrans\Config::$isProduction = config('midtrans.is_production');
+            \Midtrans\Config::$isSanitized = true;
+            \Midtrans\Config::$is3ds = true;
+
+            // 10) Generate Snap Token
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $pembayaran->id_pembayaran . '-' . Carbon::now()->timestamp,
+                    'gross_amount' => $totalPrice,
+                ],
+                'customer_details' => [
+                    'first_name' => $user->nama_lengkap,
+                    'email' => $user->email,
+                    'phone' => $user->no_telepon,
+                ],
+                'item_details' => $itemDetails,
+            ];
+
             $snapToken = \Midtrans\Snap::getSnapToken($params);
             $pembayaran->update(['snap_token' => $snapToken]);
 
@@ -342,16 +343,15 @@ class BookingController extends Controller
             }
 
             return redirect()->away(\Midtrans\Snap::getSnapUrl($snapToken));
-
         } catch (\Exception $e) {
-            Log::error("Midtrans Error: {$e->getMessage()}");
-            $msg = 'Gagal memproses pembayaran: ' . $e->getMessage();
+            Log::error("Booking Error: {$e->getMessage()}");
+            $msg = 'Gagal memproses pemesanan: ' . $e->getMessage();
 
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $msg], 500);
             }
 
-            return redirect()->back()->withErrors(['payment' => $msg]);
+            return redirect()->back()->withErrors(['booking' => $msg]);
         }
     }
 
@@ -377,14 +377,15 @@ class BookingController extends Controller
             $pembayaran->pemesanan->update([
                 'status_pemesanan' => 'confirmed',
                 'status_pembayaran' => 'paid',
+                'status' => 'confirmed',
             ]);
           // Kirim email konfirmasi
           $pemesanan = $pembayaran->pemesanan;
     try {
-        \Mail::to($pemesanan->pelanggan->email)
+        Mail::to($pemesanan->pelanggan->email)
              ->send(new \App\Mail\BookingConfirmation($pemesanan));
     } catch (\Exception $e) {
-        \Log::error('Failed to send booking confirmation email: ' . $e->getMessage());
+        Log::error('Failed to send booking confirmation email: ' . $e->getMessage());
     }
 
     $message = 'Pembayaran berhasil. Email konfirmasi telah dikirim!';

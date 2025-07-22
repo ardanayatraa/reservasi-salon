@@ -43,6 +43,10 @@ class PemesananController extends Controller
         $v['sub_total'] = $sub;
         $v['total']     = $sub;
 
+        // Set payment_deadline dan status
+        $v['payment_deadline'] = now()->addMinutes(30);
+        $v['status'] = 'menunggu pembayaran';
+
         Pemesanan::create($v);
 
         return redirect()->route('pemesanan.index')

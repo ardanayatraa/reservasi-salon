@@ -33,7 +33,9 @@ class Pemesanan extends Model
         'started_at',
         'reschedule_count',
         'original_date',
-        'original_time'
+        'original_time',
+        'payment_deadline',
+        'status'
     ];
 
     protected $casts = [
@@ -45,6 +47,7 @@ class Pemesanan extends Model
         'reschedule_count' => 'integer',
         'total' => 'decimal:2',
         'sub_total' => 'decimal:2',
+        'payment_deadline' => 'datetime',
     ];
 
     // Existing relationships
