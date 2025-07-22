@@ -28,12 +28,16 @@ class DashboardController extends Controller
         $totalPaid   = Pembayaran::where('status_pembayaran', 'paid')->count();
         $totalUnpaid = Pembayaran::where('status_pembayaran', 'unpaid')->count();
 
+        // Ambil semua pemesanan dengan detailnya
+        $bookings = Pemesanan::with(['pelanggan', 'bookeds.perawatan', 'pembayaran'])->latest()->get();
+
         return view('dashboard', compact(
             'totalPemesanan',
             'totalPelanggan',
             'totalKaryawan',
             'totalPaid',
-            'totalUnpaid'
+            'totalUnpaid',
+            'bookings'
         ));
     }
 }

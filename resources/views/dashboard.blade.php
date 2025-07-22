@@ -36,4 +36,6 @@
             </div>
         </div>
     </div>
+
+    @include('admin.bookings._table')
 </x-app-layout>

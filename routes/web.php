@@ -61,8 +61,7 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::put('/perawatan/{perawatan}', [PerawatanController::class, 'update'])->name('perawatan.update');
     Route::delete('/perawatan/{perawatan}', [PerawatanController::class, 'destroy'])->name('perawatan.destroy');
 
-    // Pemesanan Routes
-    Route::get('/pemesanan', [PemesananController::class, 'index'])->name('pemesanan.index');
+    // Pemesanan Routes (Index route is now handled by DashboardController)
     Route::get('/pemesanan/create', [PemesananController::class, 'create'])->name('pemesanan.create');
     Route::post('/pemesanan', [PemesananController::class, 'store'])->name('pemesanan.store');
     Route::get('/pemesanan/{pemesanan}', [PemesananController::class, 'show'])->name('pemesanan.show');
@@ -79,8 +78,7 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::put('/pembayaran/{pembayaran}', [PembayaranController::class, 'update'])->name('pembayaran.update');
     Route::delete('/pembayaran/{pembayaran}', [PembayaranController::class, 'destroy'])->name('pembayaran.destroy');
 
-    // Booked Routes
-    Route::get('/booked', [BookedController::class, 'index'])->name('booked.index');
+    // Booked Routes (Index route is now handled by DashboardController)
     Route::get('/booked/create', [BookedController::class, 'create'])->name('booked.create');
     Route::post('/booked', [BookedController::class, 'store'])->name('booked.store');
     Route::get('/booked/{booked}', [BookedController::class, 'show'])->name('booked.show');

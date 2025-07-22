@@ -60,7 +60,8 @@
 
         @media (min-width: 769px) {
             .main-content {
-                margin-left: 16rem; /* 256px = 16rem */
+                margin-left: 16rem;
+                /* 256px = 16rem */
             }
         }
 
@@ -120,8 +121,7 @@
     </header>
 
     <!-- Sidebar -->
-    <aside id="sidebar"
-        class="sidebar bg-sidebar-bg text-sidebar-text w-64 overflow-y-auto">
+    <aside id="sidebar" class="sidebar bg-sidebar-bg text-sidebar-text w-64 overflow-y-auto">
         <div class="p-6">
             <!-- Tombol Close untuk Mobile -->
             <div class="flex justify-between items-center mb-6 md:hidden">
@@ -154,7 +154,11 @@
                 {{-- Admin --}}
                 <a href="{{ route('admin.index') }}"
                     class="sidebar-link flex items-center px-4 py-3 rounded-sm
-                   {{ request()->routeIs('admin.index') || (request()->routeIs('admin.*') && !request()->routeIs('admin.reviews.*') && !request()->routeIs('admin.refunds.*') && !request()->routeIs('admin.cancel.*'))
+                   {{ request()->routeIs('admin.index') ||
+                   (request()->routeIs('admin.*') &&
+                       !request()->routeIs('admin.reviews.*') &&
+                       !request()->routeIs('admin.refunds.*') &&
+                       !request()->routeIs('admin.cancel.*'))
                        ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
                        : 'text-sidebar-text hover:text-sidebar-hover' }}">
                     <i class="fas fa-user-shield w-5"></i>
@@ -194,15 +198,6 @@
                 </a>
 
 
-                {{-- Booked --}}
-                <a href="{{ route('booked.index') }}"
-                    class="sidebar-link flex items-center px-4 py-3 rounded-sm
-                   {{ request()->routeIs('booked.*')
-                       ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
-                       : 'text-sidebar-text hover:text-sidebar-hover' }}">
-                    <i class="fas fa-calendar-check w-5"></i>
-                    <span class="ml-3">Booked</span>
-                </a>
 
                 {{-- Pelanggan --}}
                 <a href="{{ route('pelanggan.index') }}"
@@ -214,15 +209,6 @@
                     <span class="ml-3">Pelanggan</span>
                 </a>
 
-                {{-- Pemesanan --}}
-                <a href="{{ route('pemesanan.index') }}"
-                    class="sidebar-link flex items-center px-4 py-3 rounded-sm
-                   {{ request()->routeIs('pemesanan.*')
-                       ? 'text-sidebar-hover bg-opacity-20 bg-sidebar-hover'
-                       : 'text-sidebar-text hover:text-sidebar-hover' }}">
-                    <i class="fas fa-shopping-cart w-5"></i>
-                    <span class="ml-3">Pemesanan</span>
-                </a>
 
                 {{-- Pembayaran --}}
                 <a href="{{ route('pembayaran.index') }}"
