@@ -28,7 +28,13 @@ class KaryawanController extends Controller
             'no_telepon'   => 'nullable|string|max:20',
             'alamat'       => 'nullable|string',
             'id_shift'     => 'required|exists:shifts,id_shift',
+            'availability_status' => 'nullable|in:available,unavailable',
         ]);
+
+        // Set default availability status if not provided
+        if (!isset($v['availability_status'])) {
+            $v['availability_status'] = 'available';
+        }
 
         Karyawan::create($v);
 
@@ -56,6 +62,7 @@ class KaryawanController extends Controller
             'no_telepon'   => 'nullable|string|max:20',
             'alamat'       => 'nullable|string',
             'id_shift'     => 'required|exists:shifts,id_shift',
+            'availability_status' => 'nullable|in:available,unavailable',
         ]);
 
         $karyawan->update($v);

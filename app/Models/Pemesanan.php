@@ -289,4 +289,52 @@ class Pemesanan extends Model
 
         return $classes[$this->status_pembayaran] ?? 'bg-secondary';
     }
+
+    /**
+     * Check if payment deadline has passed
+     *
+     * @return bool
+     */
+    public function isPaymentDeadlinePassed()
+    {
+        if (!$this->payment_deadline) {
+            return false;
+        }
+
+        return now()->gt($this->payment_deadline);
+    }
+
+    /**
+     * Check if the reservation is waiting for payment
+     *
+     * @return bool
+     */
+    public function isWaitingForPayment()
+    {
+        return $this->status_pembayaran === 'pending';
+    }
+
+    /**
+     * Cancel the reservation due to payment deadline
+     *
+     * @return void
+     */
+    public function cancelDueToPaymentDeadline()
+    {
+        $this->update([
+            'status_pemesanan' => 'cancelled',
+            'status_pembayaran' => 'failed',
+            'alasan_pembatalan' => 'Batas waktu pembayaran telah berakhir',
+            'cancelled_at' => now(),
+            'cancelled_by' => 'system'
+        ]);
+
+        // Release the employee if assigned
+        if ($this->id_karyawan) {
+            $karyawan = Karyawan::find($this->id_karyawan);
+            if ($karyawan) {
+                $karyawan->setAvailable();
+            }
+        }
+    }
 }

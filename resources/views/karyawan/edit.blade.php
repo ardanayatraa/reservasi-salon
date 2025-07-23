@@ -50,6 +50,26 @@
                         </select>
                         <x-input-error for="id_shift" class="mt-2" />
                     </div>
+                    <div>
+                        <x-label for="availability_status" value="Status Ketersediaan" />
+                        <div class="mt-2">
+                            <div class="flex items-center space-x-4">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="availability_status" value="available"
+                                        class="form-radio"
+                                        {{ old('availability_status', $karyawan->availability_status) === 'available' ? 'checked' : '' }}>
+                                    <span class="ml-2">Tersedia</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="availability_status" value="unavailable"
+                                        class="form-radio"
+                                        {{ old('availability_status', $karyawan->availability_status) === 'unavailable' ? 'checked' : '' }}>
+                                    <span class="ml-2">Tidak Tersedia</span>
+                                </label>
+                            </div>
+                        </div>
+                        <x-input-error for="availability_status" class="mt-2" />
+                    </div>
                 </div>
 
                 <div class="mt-6 flex justify-end">

@@ -15,6 +15,11 @@ class Karyawan extends Model
         'no_telepon',
         'alamat',
         'id_shift',
+        'availability_status',
+    ];
+
+    protected $casts = [
+        'availability_status' => 'string',
     ];
 
     public function shift()
@@ -25,5 +30,35 @@ class Karyawan extends Model
     public function pemesanans()
     {
         return $this->hasMany(Pemesanan::class, 'id_karyawan', 'id_karyawan');
+    }
+
+    /**
+     * Check if the employee is available
+     *
+     * @return bool
+     */
+    public function isAvailable()
+    {
+        return $this->availability_status === 'available';
+    }
+
+    /**
+     * Set employee as available
+     *
+     * @return void
+     */
+    public function setAvailable()
+    {
+        $this->update(['availability_status' => 'available']);
+    }
+
+    /**
+     * Set employee as unavailable
+     *
+     * @return void
+     */
+    public function setUnavailable()
+    {
+        $this->update(['availability_status' => 'unavailable']);
     }
 }
