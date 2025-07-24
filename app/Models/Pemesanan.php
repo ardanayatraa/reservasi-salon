@@ -201,6 +201,8 @@ class Pemesanan extends Model
             'in_progress' => 'Sedang Berlangsung',
             'completed' => 'Selesai',
             'cancelled' => 'Dibatalkan',
+            'cancelled_by_salon' => 'Dibatalkan oleh Salon',
+            'no_show' => 'Tidak Hadir',
             'rescheduled' => 'Dijadwal Ulang'
         ];
 
@@ -269,6 +271,8 @@ class Pemesanan extends Model
             'in_progress' => 'bg-primary',
             'completed' => 'bg-success',
             'cancelled' => 'bg-danger',
+            'cancelled_by_salon' => 'bg-danger',
+            'no_show' => 'bg-dark',
             'rescheduled' => 'bg-secondary'
         ];
 

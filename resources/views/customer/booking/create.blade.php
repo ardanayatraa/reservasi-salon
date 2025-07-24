@@ -352,6 +352,12 @@
             opacity: 0.6;
         }
 
+        .time-slot.time-conflict {
+            background: #ffe5e5;
+            border-color: #ffcccc;
+            color: #dc3545;
+        }
+
         .empty-state {
             background: #f8f9fa;
             border-radius: 0.5rem;
@@ -570,6 +576,12 @@
                         if (!data.available) {
                             slot.classList.add('unavailable');
                             slot.style.pointerEvents = 'none';
+
+                            // Jika ada konflik waktu, tambahkan tooltip atau class khusus
+                            if (data.has_time_conflict) {
+                                slot.title = "Waktu ini sudah dibooking untuk layanan lain";
+                                slot.classList.add('time-conflict');
+                            }
                         }
                     })
                     .catch(error => console.error('Error:', error));

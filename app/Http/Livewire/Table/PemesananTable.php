@@ -11,8 +11,14 @@ class PemesananTable extends LivewireDatatable
 {
     public $model = PemesananModel::class;
     public $statuses = [
-        'confirmed' => 'Confirmed',
-        'completed' => 'Completed',
+        'pending' => 'Menunggu',
+        'confirmed' => 'Dikonfirmasi',
+        'in_progress' => 'Sedang Berlangsung',
+        'completed' => 'Selesai',
+        'cancelled' => 'Dibatalkan',
+        'cancelled_by_salon' => 'Dibatalkan oleh Salon',
+        'no_show' => 'Tidak Hadir',
+        'rescheduled' => 'Dijadwal Ulang',
     ];
 
     protected $listeners = ['changeStatus' => 'updateStatus'];

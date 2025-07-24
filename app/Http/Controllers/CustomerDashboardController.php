@@ -487,7 +487,10 @@ public function updatePaymentStatus(Request $request)
             $pemesanan->update([
                 'tanggal_pemesanan' => $request->new_date,
                 'waktu' => $request->new_time . ':00',
-                'reschedule_count' => $pemesanan->reschedule_count + 1
+                'reschedule_count' => $pemesanan->reschedule_count + 1,
+                'status_pemesanan' => 'rescheduled',
+                'original_date' => $oldDate,
+                'original_time' => $oldTime
             ]);
 
             // Update detail booking
@@ -806,10 +809,46 @@ public function checkAvailability(Request $request)
     // Cari shift yang mencakup waktu ini
     $availableEmployees = $this->findAvailableEmployees($date, $startTime, $endTime);
 
+    // Cek jika ada pemesanan yang overlap dengan waktu yang diminta
+    $existingBookings = Pemesanan::where('tanggal_pemesanan', $date)
+        ->whereIn('status_pemesanan', ['confirmed', 'pending', 'in_progress'])
+        ->get();
+
+    $hasTimeConflict = false;
+
+    foreach ($existingBookings as $booking) {
+        // Hitung durasi total dari semua layanan dalam booking ini
+        $bookingDuration = 0;
+        foreach ($booking->bookeds as $booked) {
+            if ($booked->perawatan) {
+                $bookingDuration += $booked->perawatan->waktu ?? 60;
+            } else {
+                $bookingDuration += 60;
+            }
+        }
+
+        // Hitung waktu selesai booking yang ada
+        $bookingStart = Carbon::parse($booking->waktu);
+        $bookingEnd = $bookingStart->copy()->addMinutes($bookingDuration);
+
+        $newStart = Carbon::parse($startTime);
+        $newEnd = Carbon::parse($endTime);
+
+        // Cek apakah ada overlap
+        if ($this->hasTimeOverlap($newStart, $newEnd, $bookingStart, $bookingEnd)) {
+            $hasTimeConflict = true;
+            break;
+        }
+    }
+
+    // Jika ada konflik waktu, tandai sebagai tidak tersedia
+    $isAvailable = count($availableEmployees) > 0 && !$hasTimeConflict;
+
     return response()->json([
-        'available' => count($availableEmployees) > 0,
+        'available' => $isAvailable,
         'employees' => $availableEmployees,
         'slots_available' => count($availableEmployees),
+        'has_time_conflict' => $hasTimeConflict,
         'debug' => [
             'date' => $date,
             'start_time' => $startTime,
@@ -855,6 +894,11 @@ private function findAvailableEmployees($date, $startTime, $endTime)
 
     foreach ($shifts as $shift) {
         foreach ($shift->karyawans as $karyawan) {
+            // Cek apakah karyawan aktif (availability_status = 'available')
+            if ($karyawan->availability_status !== 'available') {
+                continue; // Skip karyawan yang tidak aktif
+            }
+
             // Cek apakah karyawan sudah ada booking yang bentrok
             $hasConflict = $this->checkEmployeeConflict($karyawan->id_karyawan, $date, $startTime, $endTime);
 
