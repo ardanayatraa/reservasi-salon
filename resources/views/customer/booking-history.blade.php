@@ -362,7 +362,17 @@
             // Reset form
             $('#new_date').val('');
             $('#new_time').val('');
-            $('#timeSlots').html('<p class="text-muted">Silakan pilih tanggal terlebih dahulu</p>');
+
+            // Make sure the timeSlots container exists and is initialized
+            const timeSlotsContainer = document.getElementById('timeSlots');
+            if (timeSlotsContainer) {
+                timeSlotsContainer.innerHTML =
+                    '<p class="text-muted" id="timeSlotsMessage">Silakan pilih tanggal terlebih dahulu</p>' +
+                    '<div class="spinner-border text-primary d-none" id="timeSlotsLoading" role="status">' +
+                    '<span class="visually-hidden">Loading...</span>' +
+                    '</div>';
+            }
+
             $('#rescheduleButton').prop('disabled', true);
 
             var rescheduleModal = new bootstrap.Modal(document.getElementById('rescheduleModal'));
@@ -394,17 +404,35 @@
         });
 
         function fetchAvailableTimeSlots(date) {
-            const timeSlotsContainer = document.getElementById('timeSlots');
-            const loadingSpinner = document.getElementById('timeSlotsLoading');
-            const timeSlotsMessage = document.getElementById('timeSlotsMessage');
-
-            if (!timeSlotsContainer || !loadingSpinner || !timeSlotsMessage) {
-                console.error('Required elements not found');
+            // Get or create the required elements
+            let timeSlotsContainer = document.getElementById('timeSlots');
+            if (!timeSlotsContainer) {
+                console.error('timeSlots container not found');
                 return;
             }
 
-            // Show loading
+            // Clear the container and add the loading elements if they don't exist
             timeSlotsContainer.innerHTML = '';
+
+            let loadingSpinner = document.getElementById('timeSlotsLoading');
+            if (!loadingSpinner) {
+                loadingSpinner = document.createElement('div');
+                loadingSpinner.id = 'timeSlotsLoading';
+                loadingSpinner.className = 'spinner-border text-primary';
+                loadingSpinner.setAttribute('role', 'status');
+                loadingSpinner.innerHTML = '<span class="visually-hidden">Loading...</span>';
+                timeSlotsContainer.appendChild(loadingSpinner);
+            }
+
+            let timeSlotsMessage = document.getElementById('timeSlotsMessage');
+            if (!timeSlotsMessage) {
+                timeSlotsMessage = document.createElement('p');
+                timeSlotsMessage.id = 'timeSlotsMessage';
+                timeSlotsMessage.className = 'text-muted';
+                timeSlotsContainer.appendChild(timeSlotsMessage);
+            }
+
+            // Show loading
             loadingSpinner.classList.remove('d-none');
             timeSlotsMessage.textContent = 'Memuat slot waktu yang tersedia...';
             timeSlotsMessage.classList.remove('d-none');
