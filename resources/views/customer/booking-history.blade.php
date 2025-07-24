@@ -398,6 +398,11 @@
             const loadingSpinner = document.getElementById('timeSlotsLoading');
             const timeSlotsMessage = document.getElementById('timeSlotsMessage');
 
+            if (!timeSlotsContainer || !loadingSpinner || !timeSlotsMessage) {
+                console.error('Required elements not found');
+                return;
+            }
+
             // Show loading
             timeSlotsContainer.innerHTML = '';
             loadingSpinner.classList.remove('d-none');
@@ -418,14 +423,16 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    loadingSpinner.classList.add('d-none');
+                    if (loadingSpinner) loadingSpinner.classList.add('d-none');
 
                     if (!data.time_slots || data.time_slots.length === 0) {
-                        timeSlotsMessage.textContent = 'Tidak ada slot waktu yang tersedia pada tanggal ini';
+                        if (timeSlotsMessage) {
+                            timeSlotsMessage.textContent = 'Tidak ada slot waktu yang tersedia pada tanggal ini';
+                        }
                         return;
                     }
 
-                    timeSlotsMessage.classList.add('d-none');
+                    if (timeSlotsMessage) timeSlotsMessage.classList.add('d-none');
 
                     // Render time slots
                     let html = '<div class="time-slots-container">';
@@ -435,12 +442,12 @@
                     });
                     html += '</div>';
 
-                    timeSlotsContainer.innerHTML = html;
+                    if (timeSlotsContainer) timeSlotsContainer.innerHTML = html;
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    loadingSpinner.classList.add('d-none');
-                    timeSlotsMessage.textContent = 'Terjadi kesalahan saat memuat slot waktu';
+                    if (loadingSpinner) loadingSpinner.classList.add('d-none');
+                    if (timeSlotsMessage) timeSlotsMessage.textContent = 'Terjadi kesalahan saat memuat slot waktu';
                 });
         }
 
@@ -451,13 +458,22 @@
             });
 
             // Add selected class to clicked time slot
-            document.querySelector(`.time-slot[data-time="${time}"]`).classList.add('selected');
+            const selectedSlot = document.querySelector(`.time-slot[data-time="${time}"]`);
+            if (selectedSlot) {
+                selectedSlot.classList.add('selected');
+            }
 
             // Set the hidden input value
-            document.getElementById('new_time').value = time;
+            const timeInput = document.getElementById('new_time');
+            if (timeInput) {
+                timeInput.value = time;
+            }
 
             // Enable the reschedule button
-            document.getElementById('rescheduleButton').disabled = false;
+            const rescheduleButton = document.getElementById('rescheduleButton');
+            if (rescheduleButton) {
+                rescheduleButton.disabled = false;
+            }
         }
 
 
