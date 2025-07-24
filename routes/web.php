@@ -61,8 +61,7 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::put('/perawatan/{perawatan}', [PerawatanController::class, 'update'])->name('perawatan.update');
     Route::delete('/perawatan/{perawatan}', [PerawatanController::class, 'destroy'])->name('perawatan.destroy');
 
-    // Pemesanan Routes
-    Route::get('/pemesanan', [PemesananController::class, 'index'])->name('pemesanan.index');
+    // Pemesanan Routes (Index route is now handled by DashboardController)
     Route::get('/pemesanan/create', [PemesananController::class, 'create'])->name('pemesanan.create');
     Route::post('/pemesanan', [PemesananController::class, 'store'])->name('pemesanan.store');
     Route::get('/pemesanan/{pemesanan}', [PemesananController::class, 'show'])->name('pemesanan.show');

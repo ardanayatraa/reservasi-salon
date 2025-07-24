@@ -196,7 +196,7 @@
 
     <!-- Reschedule Booking Modal -->
     <div class="modal fade" id="rescheduleModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Reschedule Booking</h5>
@@ -211,14 +211,29 @@
                             <input type="date" class="form-control" name="new_date" id="new_date" required
                                 min="{{ \Carbon\Carbon::tomorrow()->toDateString() }}">
                         </div>
-                        <div class="form-group">
-                            <label for="new_time">Waktu Baru</label>
-                            <input type="time" class="form-control" name="new_time" id="new_time" required>
+
+                        <div class="form-group mb-3">
+                            <label>Waktu Tersedia</label>
+                            <div id="timeSlots" class="mt-2">
+                                <div class="text-center py-3">
+                                    <div class="spinner-border text-primary d-none" id="timeSlotsLoading" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="text-muted" id="timeSlotsMessage">Silakan pilih tanggal terlebih dahulu</p>
+                                </div>
+                            </div>
+                            <input type="hidden" name="new_time" id="new_time" required>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Hanya slot waktu yang tersedia yang akan ditampilkan
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                        <button type="submit" class="btn btn-info">Reschedule Booking</button>
+                        <button type="submit" class="btn btn-info" id="rescheduleButton" disabled>Reschedule
+                            Booking</button>
                     </div>
                 </form>
             </div>
@@ -290,11 +305,50 @@
             color: #ffc107;
             font-size: 1.2rem;
         }
+
+        /* Time slot styles */
+        .time-slots-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .time-slot {
+            border: 2px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 80px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .time-slot:hover {
+            border-color: #007bff;
+            background: #e7f1ff;
+        }
+
+        .time-slot.selected {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .time-slot.unavailable {
+            background: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
     </style>
 @endpush
-
 @push('scripts')
     <script>
+        let currentBookingId = null;
+        let currentBookingServices = [];
+
         function showCancelModal(bookingId) {
             $('#cancelForm').attr('action', `/customer/booking/${bookingId}/cancel`);
             var cancelModal = new bootstrap.Modal(document.getElementById('cancelModal'));
@@ -302,7 +356,15 @@
         }
 
         function showRescheduleModal(bookingId) {
+            currentBookingId = bookingId;
             $('#rescheduleForm').attr('action', `/customer/booking/${bookingId}/reschedule`);
+
+            // Reset form
+            $('#new_date').val('');
+            $('#new_time').val('');
+            $('#timeSlots').html('<p class="text-muted">Silakan pilih tanggal terlebih dahulu</p>');
+            $('#rescheduleButton').prop('disabled', true);
+
             var rescheduleModal = new bootstrap.Modal(document.getElementById('rescheduleModal'));
             rescheduleModal.show();
         }
@@ -316,6 +378,88 @@
             var reviewModal = new bootstrap.Modal(document.getElementById('reviewModal'));
             reviewModal.show();
         }
+
+        // Fetch available time slots when date is selected
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('new_date');
+
+            if (dateInput) {
+                dateInput.addEventListener('change', function() {
+                    const selectedDate = this.value;
+                    if (!selectedDate) return;
+
+                    fetchAvailableTimeSlots(selectedDate);
+                });
+            }
+        });
+
+        function fetchAvailableTimeSlots(date) {
+            const timeSlotsContainer = document.getElementById('timeSlots');
+            const loadingSpinner = document.getElementById('timeSlotsLoading');
+            const timeSlotsMessage = document.getElementById('timeSlotsMessage');
+
+            // Show loading
+            timeSlotsContainer.innerHTML = '';
+            loadingSpinner.classList.remove('d-none');
+            timeSlotsMessage.textContent = 'Memuat slot waktu yang tersedia...';
+            timeSlotsMessage.classList.remove('d-none');
+
+            // Fetch available time slots from server
+            fetch('{{ route('customer.booking.check-availability') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        date: date,
+                        booking_id: currentBookingId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    loadingSpinner.classList.add('d-none');
+
+                    if (!data.time_slots || data.time_slots.length === 0) {
+                        timeSlotsMessage.textContent = 'Tidak ada slot waktu yang tersedia pada tanggal ini';
+                        return;
+                    }
+
+                    timeSlotsMessage.classList.add('d-none');
+
+                    // Render time slots
+                    let html = '<div class="time-slots-container">';
+                    data.time_slots.forEach(slot => {
+                        html +=
+                            `<span class="time-slot" data-time="${slot}" onclick="selectTimeSlot('${slot}')">${slot}</span>`;
+                    });
+                    html += '</div>';
+
+                    timeSlotsContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    loadingSpinner.classList.add('d-none');
+                    timeSlotsMessage.textContent = 'Terjadi kesalahan saat memuat slot waktu';
+                });
+        }
+
+        function selectTimeSlot(time) {
+            // Remove selected class from all time slots
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.classList.remove('selected');
+            });
+
+            // Add selected class to clicked time slot
+            document.querySelector(`.time-slot[data-time="${time}"]`).classList.add('selected');
+
+            // Set the hidden input value
+            document.getElementById('new_time').value = time;
+
+            // Enable the reschedule button
+            document.getElementById('rescheduleButton').disabled = false;
+        }
+
 
 
         // Rating functionality (Updated)

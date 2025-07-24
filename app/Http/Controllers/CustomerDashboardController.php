@@ -793,68 +793,175 @@ public function createBooking(Request $request)
  */
 public function checkAvailability(Request $request)
 {
-    $request->validate([
+    // Validasi request
+    $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
         'date' => 'required|date',
-        'start_time' => 'required|date_format:H:i',
-        'duration' => 'required|integer|min:1',
+        'booking_id' => 'nullable|exists:pemesanans,id_pemesanan',
     ]);
 
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validasi gagal',
+            'errors' => $validator->errors()
+        ], 422);
+    }
+
     $date = $request->date;
-    $startTime = $request->start_time;
-    $duration = $request->duration;
+    $bookingId = $request->booking_id;
 
-    // Hitung waktu selesai
-    $endTime = Carbon::parse($startTime)->addMinutes($duration)->format('H:i');
+    // Jika ini untuk reschedule, ambil data booking yang akan di-reschedule
+    $currentBooking = null;
+    $serviceDuration = 60; // Default duration
 
-    // Cari shift yang mencakup waktu ini
-    $availableEmployees = $this->findAvailableEmployees($date, $startTime, $endTime);
+    if ($bookingId) {
+        $currentBooking = Pemesanan::with('bookeds.perawatan')->find($bookingId);
 
-    // Cek jika ada pemesanan yang overlap dengan waktu yang diminta
-    $existingBookings = Pemesanan::where('tanggal_pemesanan', $date)
-        ->whereIn('status_pemesanan', ['confirmed', 'pending', 'in_progress'])
-        ->get();
+        if ($currentBooking) {
+            // Hitung total durasi layanan
+            $serviceDuration = 0;
+            foreach ($currentBooking->bookeds as $booked) {
+                if ($booked->perawatan) {
+                    $serviceDuration += $booked->perawatan->waktu ?? 60;
+                } else {
+                    $serviceDuration += 60;
+                }
+            }
+        }
+    } else if ($request->has('start_time') && $request->has('duration')) {
+        // Jika ini untuk booking baru
+        $startTime = $request->start_time;
+        $serviceDuration = $request->duration;
 
-    $hasTimeConflict = false;
+        // Hitung waktu selesai
+        $endTime = Carbon::parse($startTime)->addMinutes($serviceDuration)->format('H:i');
 
-    foreach ($existingBookings as $booking) {
-        // Hitung durasi total dari semua layanan dalam booking ini
-        $bookingDuration = 0;
-        foreach ($booking->bookeds as $booked) {
-            if ($booked->perawatan) {
-                $bookingDuration += $booked->perawatan->waktu ?? 60;
-            } else {
-                $bookingDuration += 60;
+        // Cari shift yang mencakup waktu ini
+        $availableEmployees = $this->findAvailableEmployees($date, $startTime, $endTime);
+
+        // Cek jika ada pemesanan yang overlap dengan waktu yang diminta
+        $existingBookings = Pemesanan::where('tanggal_pemesanan', $date)
+            ->whereIn('status_pemesanan', ['confirmed', 'pending', 'in_progress'])
+            ->get();
+
+        $hasTimeConflict = false;
+
+        foreach ($existingBookings as $booking) {
+            // Hitung durasi total dari semua layanan dalam booking ini
+            $bookingDuration = 0;
+            foreach ($booking->bookeds as $booked) {
+                if ($booked->perawatan) {
+                    $bookingDuration += $booked->perawatan->waktu ?? 60;
+                } else {
+                    $bookingDuration += 60;
+                }
+            }
+
+            // Hitung waktu selesai booking yang ada
+            $bookingStart = Carbon::parse($booking->waktu);
+            $bookingEnd = $bookingStart->copy()->addMinutes($bookingDuration);
+
+            $newStart = Carbon::parse($startTime);
+            $newEnd = Carbon::parse($endTime);
+
+            // Cek apakah ada overlap
+            if ($this->hasTimeOverlap($newStart, $newEnd, $bookingStart, $bookingEnd)) {
+                $hasTimeConflict = true;
+                break;
             }
         }
 
-        // Hitung waktu selesai booking yang ada
-        $bookingStart = Carbon::parse($booking->waktu);
-        $bookingEnd = $bookingStart->copy()->addMinutes($bookingDuration);
+        // Jika ada konflik waktu, tandai sebagai tidak tersedia
+        $isAvailable = count($availableEmployees) > 0 && !$hasTimeConflict;
 
-        $newStart = Carbon::parse($startTime);
-        $newEnd = Carbon::parse($endTime);
+        return response()->json([
+            'available' => $isAvailable,
+            'employees' => $availableEmployees,
+            'slots_available' => count($availableEmployees),
+            'has_time_conflict' => $hasTimeConflict,
+            'debug' => [
+                'date' => $date,
+                'start_time' => $startTime,
+                'end_time' => $endTime,
+                'duration' => $serviceDuration
+            ]
+        ]);
+    }
 
-        // Cek apakah ada overlap
-        if ($this->hasTimeOverlap($newStart, $newEnd, $bookingStart, $bookingEnd)) {
-            $hasTimeConflict = true;
-            break;
+    // Ambil semua shift yang tersedia pada tanggal tersebut
+    $shifts = Shift::all();
+    $availableTimeSlots = [];
+
+    // Untuk setiap shift, cek slot waktu yang tersedia
+    foreach ($shifts as $shift) {
+        $startTime = Carbon::parse($shift->start_time);
+        $endTime = Carbon::parse($shift->end_time);
+
+        // Generate slot waktu dengan interval 30 menit
+        while ($startTime->lt($endTime)) {
+            $slotStart = $startTime->format('H:i');
+            $slotEnd = $startTime->copy()->addMinutes($serviceDuration)->format('H:i');
+
+            // Cek apakah slot waktu ini tersedia
+            if (Carbon::parse($slotEnd)->lte($endTime)) {
+                $availableEmployees = $this->findAvailableEmployees($date, $slotStart, $slotEnd);
+
+                // Cek jika ada pemesanan yang overlap dengan waktu yang diminta
+                $existingBookings = Pemesanan::where('tanggal_pemesanan', $date)
+                    ->whereIn('status_pemesanan', ['confirmed', 'pending', 'in_progress'])
+                    ->get();
+
+                if ($bookingId) {
+                    // Exclude current booking from conflict check for reschedule
+                    $existingBookings = $existingBookings->filter(function($booking) use ($bookingId) {
+                        return $booking->id_pemesanan != $bookingId;
+                    });
+                }
+
+                $hasTimeConflict = false;
+
+                foreach ($existingBookings as $booking) {
+                    // Hitung durasi total dari semua layanan dalam booking ini
+                    $bookingDuration = 0;
+                    foreach ($booking->bookeds as $booked) {
+                        if ($booked->perawatan) {
+                            $bookingDuration += $booked->perawatan->waktu ?? 60;
+                        } else {
+                            $bookingDuration += 60;
+                        }
+                    }
+
+                    // Hitung waktu selesai booking yang ada
+                    $bookingStart = Carbon::parse($booking->waktu);
+                    $bookingEnd = $bookingStart->copy()->addMinutes($bookingDuration);
+
+                    $newStart = Carbon::parse($slotStart);
+                    $newEnd = Carbon::parse($slotEnd);
+
+                    // Cek apakah ada overlap
+                    if ($this->hasTimeOverlap($newStart, $newEnd, $bookingStart, $bookingEnd)) {
+                        $hasTimeConflict = true;
+                        break;
+                    }
+                }
+
+                // Jika tidak ada konflik dan ada karyawan tersedia, tambahkan ke daftar slot tersedia
+                if (!$hasTimeConflict && count($availableEmployees) > 0) {
+                    $availableTimeSlots[] = $slotStart;
+                }
+            }
+
+            // Pindah ke slot berikutnya (interval 30 menit)
+            $startTime->addMinutes(30);
         }
     }
 
-    // Jika ada konflik waktu, tandai sebagai tidak tersedia
-    $isAvailable = count($availableEmployees) > 0 && !$hasTimeConflict;
-
     return response()->json([
-        'available' => $isAvailable,
-        'employees' => $availableEmployees,
-        'slots_available' => count($availableEmployees),
-        'has_time_conflict' => $hasTimeConflict,
-        'debug' => [
-            'date' => $date,
-            'start_time' => $startTime,
-            'end_time' => $endTime,
-            'duration' => $duration
-        ]
+        'success' => true,
+        'time_slots' => $availableTimeSlots,
+        'date' => $date,
+        'booking_id' => $bookingId,
+        'service_duration' => $serviceDuration
     ]);
 }
 
