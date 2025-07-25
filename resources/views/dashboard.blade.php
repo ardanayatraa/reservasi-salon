@@ -37,5 +37,6 @@
         </div>
     </div>
 
-    @include('admin.bookings._table')
+    {{-- @include('admin.bookings._table') --}}
+    @livewire('table.pemesanan-table')
 </x-app-layout>
