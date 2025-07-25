@@ -50,7 +50,7 @@ class PemesananTable extends LivewireDatatable
                 })->implode(' ');
             })->label('Perawatan')->unsortable()->exportCallback(function () {
                 return '-'; // atau gabungkan perawatan jika ingin ekspor
-            })->html(),
+            }),
 
 
             Column::name('pelanggan.nama_lengkap')
