@@ -65,22 +65,9 @@ class PemesananTable extends LivewireDatatable
                 ->label('Tanggal')
                 ->searchable(),
 
-         Column::callback(['waktu'], function ($id) {
-    $pemesanan = \App\Models\Pemesanan::with('bookeds.perawatan')->find($id);
-
-    if (!$pemesanan) return '-';
-
-    $startTime = \Carbon\Carbon::parse($pemesanan->waktu);
-
-    $totalDuration = $pemesanan->bookeds->sum(function ($booked) {
-        return $booked->perawatan->durasi ?? 0;
-    });
-
-    $endTime = $startTime->copy()->addMinutes($totalDuration);
-
-    return $startTime->format('H:i') . ' - ' . $endTime->format('H:i');
-})->label('Rentang Waktu')->unsortable(),
-
+            Column::name('waktu')
+                ->label('Waktu Mulai')
+                ->searchable(),
 
             Column::callback(['id_pemesanan', 'status_pemesanan'], function ($id, $status) {
                 return view('components.status-dropdown', [
