@@ -203,7 +203,7 @@ class Pemesanan extends Model
             'cancelled' => 'Dibatalkan',
             'cancelled_by_salon' => 'Dibatalkan oleh Salon',
             'no_show' => 'Tidak Hadir',
-            'rescheduled' => 'Dijadwal Ulang'
+            'resheduled' => 'Dijadwal Ulang'
         ];
 
         return $translations[$this->status_pemesanan] ?? $this->status_pemesanan;
@@ -273,7 +273,7 @@ class Pemesanan extends Model
             'cancelled' => 'bg-danger',
             'cancelled_by_salon' => 'bg-danger',
             'no_show' => 'bg-dark',
-            'rescheduled' => 'bg-secondary'
+            'resheduled' => 'bg-secondary'
         ];
 
         return $classes[$this->status_pemesanan] ?? 'bg-secondary';

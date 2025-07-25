@@ -30,7 +30,7 @@ return new class extends Migration
             'cancelled',
             'cancelled_by_salon',
             'no_show',
-            'rescheduled'
+            'resheduled'
         )");
     }
 

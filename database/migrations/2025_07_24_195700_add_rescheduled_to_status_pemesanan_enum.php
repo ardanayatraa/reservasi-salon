@@ -9,7 +9,7 @@ return new class extends Migration
 {
     public function up()
     {
-        // Update enum status_pemesanan to include 'rescheduled'
+        // Update enum status_pemesanan to include 'resheduled'
         DB::statement("ALTER TABLE pemesanans MODIFY status_pemesanan ENUM(
             'pending',
             'confirmed',
@@ -18,13 +18,13 @@ return new class extends Migration
             'cancelled',
             'cancelled_by_salon',
             'no_show',
-            'rescheduled'
+            'resheduled'
         )");
     }
 
     public function down()
     {
-        // Rollback enum status_pemesanan to exclude 'rescheduled'
+        // Rollback enum status_pemesanan to exclude 'resheduled'
         DB::statement("ALTER TABLE pemesanans MODIFY status_pemesanan ENUM(
             'pending',
             'confirmed',

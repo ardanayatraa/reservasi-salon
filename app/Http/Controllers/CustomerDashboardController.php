@@ -488,7 +488,7 @@ public function updatePaymentStatus(Request $request)
                 'tanggal_pemesanan' => $request->new_date,
                 'waktu' => $request->new_time . ':00',
                 'reschedule_count' => $pemesanan->reschedule_count + 1,
-                'status_pemesanan' => 'rescheduled',
+                'status_pemesanan' => 'resheduled', // Use 'resheduled' as suggested by the user
                 'original_date' => $oldDate,
                 'original_time' => $oldTime
             ]);

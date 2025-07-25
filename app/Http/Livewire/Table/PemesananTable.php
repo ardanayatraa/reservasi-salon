@@ -18,7 +18,7 @@ class PemesananTable extends LivewireDatatable
         'cancelled' => 'Dibatalkan',
         'cancelled_by_salon' => 'Dibatalkan oleh Salon',
         'no_show' => 'Tidak Hadir',
-        'rescheduled' => 'Dijadwal Ulang',
+        'resheduled' => 'Dijadwal Ulang',
     ];
 
     protected $listeners = ['changeStatus' => 'updateStatus'];
