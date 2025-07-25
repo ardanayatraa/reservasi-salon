@@ -60,12 +60,12 @@ class PemesananTable extends LivewireDatatable
                 ]);
             })->label('Status'),
 
-            Column::callback(['id_pemesanan'], function ($id) {
-                return view('components.actions', [
-                    'route' => 'pemesanan',
-                    'id'    => $id,
-                ]);
-            })->label('Aksi'),
+            // Column::callback(['id_pemesanan'], function ($id) {
+            //     return view('components.actions', [
+            //         'route' => 'pemesanan',
+            //         'id'    => $id,
+            //     ]);
+            // })->label('Aksi'),
         ];
     }
 
