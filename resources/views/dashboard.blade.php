@@ -39,7 +39,7 @@
 
     {{-- @include('admin.bookings._table') --}}
 
-    <div class="px-4 bg-white shadow sm:rounded-lg">
+    <div class="px-4 bg-white shadow py-4 sm:rounded-lg">
 
         @livewire('table.pemesanan-table')
     </div>
