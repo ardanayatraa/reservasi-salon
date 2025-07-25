@@ -36,6 +36,23 @@ class PemesananTable extends LivewireDatatable
                 ->label('ID Pemesanan')
                 ->defaultSort('desc'),
 
+            Column::callback(['id_pemesanan'], function ($id) {
+                $pemesanan = \App\Models\Pemesanan::with('bookeds.perawatan')->find($id);
+
+                if (!$pemesanan || $pemesanan->bookeds->isEmpty()) {
+                    return '<span class="text-gray-400 italic text-sm">Tidak ada</span>';
+                }
+
+                return $pemesanan->bookeds->map(function ($booked) {
+                    $nama = $booked->perawatan->nama_perawatan ?? 'Perawatan Tidak Ditemukan';
+                    return '<span class="inline-block bg-indigo-100 text-indigo-800 text-xs font-medium px-2 py-1 rounded-full mr-1 mb-1">'
+                        . e($nama) . '</span>';
+                })->implode(' ');
+            })->label('Perawatan')->unsortable()->exportCallback(function () {
+                return '-'; // atau gabungkan perawatan jika ingin ekspor
+            })->html(),
+
+
             Column::name('pelanggan.nama_lengkap')
                 ->label('Pelanggan')
                 ->searchable(),
