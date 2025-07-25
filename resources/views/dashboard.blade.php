@@ -38,5 +38,9 @@
     </div>
 
     {{-- @include('admin.bookings._table') --}}
-    @livewire('table.pemesanan-table')
+
+    <div class="px-4 bg-white shadow sm:rounded-lg">
+
+        @livewire('table.pemesanan-table')
+    </div>
 </x-app-layout>
