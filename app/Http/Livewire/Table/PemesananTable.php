@@ -65,7 +65,7 @@ class PemesananTable extends LivewireDatatable
                 ->label('Tanggal')
                 ->searchable(),
 
-         Column::callback(['id_pemesanan'], function ($id) {
+         Column::callback(['waktu'], function ($id) {
     $pemesanan = \App\Models\Pemesanan::with('bookeds.perawatan')->find($id);
 
     if (!$pemesanan) return '-';
